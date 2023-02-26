@@ -4,14 +4,19 @@ package io.github.jingtuo.biometric.ui.login;
  * Class exposing authenticated user details to the UI.
  */
 class LoggedInUserView {
-    private String displayName;
-    //... other data fields that may be accessible to the UI
+    private String username;
+    private String password;
 
-    LoggedInUserView(String displayName) {
-        this.displayName = displayName;
+    public LoggedInUserView(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    String getDisplayName() {
-        return displayName;
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

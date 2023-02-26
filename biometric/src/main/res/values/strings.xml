@@ -1,12 +1,19 @@
 <resources>
-    <string name="app_name">Biometric</string>
+    <string name="app_name">生物识别</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="bind_biometric">绑定生物识别</string>
+    <string name="biometric_login">生物识别登录</string>
+    <string name="biometric">生物识别</string>
+    <string name="start_biometric">开始生物识别</string>
+    <string name="no_biometric_hardware">设备不支持生物识别</string>
+    <string name="no_biometric_enroll">未注册生物认证</string>
+    <string name="biometric_hardware_security_low">生物识别设备安全级别较低</string>
+    <string name="biometric_login_success">生物识别登录成功</string>
 </resources>
