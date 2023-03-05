@@ -19,12 +19,10 @@ import android.widget.Toast;
 
 
 import io.github.jingtuo.biometric.R;
-import io.github.jingtuo.biometric.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
-    private ActivityLoginBinding binding;
     private static final int LOGIN_STATE_BIND_BIOMETRIC = 1;
 
     private static final int LOGIN_STATE_BIOMETRIC_LOGIN = 2;
@@ -37,17 +35,16 @@ public class LoginActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_login);
 
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = binding.username;
-        final EditText passwordEditText = binding.password;
-        final Button bindBiometricBtn = binding.bindBiometric;
-        final Button biometricLoginBtn = binding.biometricLogin;
-        final ProgressBar loadingProgressBar = binding.loading;
+        final EditText usernameEditText = findViewById(R.id.username);
+        final EditText passwordEditText = findViewById(R.id.password);
+        final Button bindBiometricBtn = findViewById(R.id.bind_biometric);
+        final Button biometricLoginBtn = findViewById(R.id.biometric_login);
+        final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
         loginViewModel.getLoginFormState().observe(this, loginFormState -> {
             if (loginFormState == null) {
