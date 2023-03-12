@@ -18,6 +18,7 @@
         android:layout_marginTop="96dp"
         android:hint="@string/prompt_email"
         android:inputType="textEmailAddress"
+        android:maxLines="1"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,41 +31,87 @@
         android:layout_marginTop="8dp"
         android:hint="@string/prompt_password"
         android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionDone"
         android:inputType="textPassword"
+        android:maxLines="1"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username" />
+
+    <EditText
+        android:id="@+id/keyAlias"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/key_alias"
+        android:inputType="text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/authenticators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="@string/authenticators"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/keyAlias" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/strong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="@string/biometric_strong"
+        app:layout_constraintBottom_toBottomOf="@+id/authenticators"
+        app:layout_constraintLeft_toRightOf="@+id/authenticators"
+        app:layout_constraintTop_toTopOf="@+id/authenticators" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/weak"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="@string/biometric_weak"
+        app:layout_constraintBottom_toBottomOf="@+id/strong"
+        app:layout_constraintLeft_toRightOf="@+id/strong"
+        app:layout_constraintTop_toTopOf="@+id/strong" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/device_credential"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/biometric_device_credential"
+        app:layout_constraintLeft_toLeftOf="@+id/strong"
+        app:layout_constraintTop_toBottomOf="@+id/strong" />
 
     <Button
         android:id="@+id/bind_biometric"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="30dp"
         android:layout_marginBottom="64dp"
         android:enabled="false"
         android:text="@string/bind_biometric"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/biometric_login"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
+        app:layout_constraintTop_toBottomOf="@+id/keyAlias"
         app:layout_constraintVertical_bias="0.2" />
 
     <Button
         android:id="@+id/biometric_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginStart="20dp"
         android:text="@string/biometric_login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/bind_biometric"
         app:layout_constraintStart_toEndOf="@+id/bind_biometric"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintTop_toTopOf="@+id/bind_biometric" />
 
     <ProgressBar
         android:id="@+id/loading"

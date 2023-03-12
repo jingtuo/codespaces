@@ -3,10 +3,12 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
+    <string name="key_alias">密钥别名</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_key_alias">密钥别名不能为空</string>
     <string name="login_failed">"Login failed"</string>
     <string name="bind_biometric">绑定生物识别</string>
     <string name="bind_biometric_success">绑定生物识别成功</string>
@@ -16,7 +18,6 @@
     <string name="biometric_error_no_hardware">设备不支持生物识别</string>
     <string name="biometric_login_success">生物识别登录成功</string>
     <string name="biometric_error_auth_failure">生物识别失败</string>
-    <string name="biometric_error_no_crypto">未配置加密算法</string>
     <string name="biometric_error_hw_unavailable">生物识别硬件不可用, 请稍后重试</string>
     <string name="biometric_error_none_enrolled">未注册生物识别</string>
     <string name="biometric_error_security_update_required">发现多个生物识别设备, 无法使用生物识别</string>
@@ -24,4 +25,11 @@
     <string name="biometric_error_encrypt_exception">加密异常</string>
     <string name="biometric_error_decrypt_exception">解密异常</string>
     <string name="biometric_error_none_bind">未绑定生物识别</string>
+
+    <string name="biometric_strong">STRONG</string>
+    <string name="biometric_weak">WEAK</string>
+    <string name="biometric_device_credential">DEVICE_CREDENTIAL</string>
+
+    <string name="authenticators">身份验证器</string>
+
 </resources>

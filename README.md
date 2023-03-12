@@ -16,3 +16,7 @@
     ```
 
 > 当使用view-binding之后, 应用包会增加文件: META-INF/androidx.databinding_viewbinding.version, META-INF/MANIFEST.MF、META-INF/CERT.SF、classes.dex文件都会增大
+
+## kotlin
+
+1. 即使不依赖kotlin进行开发, 打出来的应用包(apk)依然会包含kotlin目录

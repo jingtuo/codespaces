@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import android.text.TextUtils;
 import android.util.Patterns;
 
 import io.github.jingtuo.biometric.data.LoginRepository;
@@ -41,12 +42,14 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    public void loginDataChanged(String username, String password) {
+    public void loginDataChanged(String username, String password, String keyAlias) {
         if (!isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
         } else if (!isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
-        } else {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else if (TextUtils.isEmpty(keyAlias)) {
+            loginFormState.setValue(new LoginFormState(null, null, R.string.invalid_key_alias));
+        }else {
             loginFormState.setValue(new LoginFormState(true));
         }
     }

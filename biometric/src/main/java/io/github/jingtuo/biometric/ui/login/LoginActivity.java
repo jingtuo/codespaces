@@ -1,6 +1,8 @@
 package io.github.jingtuo.biometric.ui.login;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.biometric.BiometricManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Build;
@@ -11,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -45,9 +46,13 @@ public class LoginActivity extends AppCompatActivity {
 
         final EditText usernameEditText = binding.username;
         final EditText passwordEditText = binding.password;
+        final EditText etKeyAlias = binding.keyAlias;
         final Button bindBiometricBtn = binding.bindBiometric;
         final Button biometricLoginBtn = binding.biometricLogin;
         final ProgressBar loadingProgressBar = binding.loading;
+        final AppCompatCheckBox cbStrong = binding.strong;
+        final AppCompatCheckBox cbWeak = binding.weak;
+        final AppCompatCheckBox cbDc = binding.deviceCredential;
 
         loginViewModel.getLoginFormState().observe(this, loginFormState -> {
             if (loginFormState == null) {
@@ -74,7 +79,10 @@ public class LoginActivity extends AppCompatActivity {
                 if (LOGIN_STATE_BIND_BIOMETRIC == loginState) {
                     //登录成功之后, 进行生物识别再加密
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        bindBiometric(loginResult.getSuccess().getUsername(), loginResult.getSuccess().getPassword());
+                        bindBiometric(loginResult.getSuccess().getUsername(),
+                                loginResult.getSuccess().getPassword(),
+                                etKeyAlias.getText().toString(),
+                                getAuthenticators(cbStrong, cbWeak, cbDc));
                     } else {
                         Toast.makeText(LoginActivity.this, R.string.biometric_error_no_hardware, Toast.LENGTH_SHORT).show();
                     }
@@ -98,19 +106,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                        passwordEditText.getText().toString(), etKeyAlias.getText().toString());
             }
         };
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                loginState = LOGIN_STATE_BIND_BIOMETRIC;
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-            }
-            return false;
-        });
+        etKeyAlias.addTextChangedListener(afterTextChangedListener);
 
         bindBiometricBtn.setOnClickListener(v -> {
             loadingProgressBar.setVisibility(View.VISIBLE);
@@ -122,24 +123,25 @@ public class LoginActivity extends AppCompatActivity {
         biometricLoginBtn.setOnClickListener(v -> {
             loginState = LOGIN_STATE_BIOMETRIC_LOGIN;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                biometricLogin(usernameEditText.getText().toString());
+                biometricLogin(usernameEditText.getText().toString(),
+                        etKeyAlias.getText().toString(),
+                        getAuthenticators(cbStrong, cbWeak, cbDc));
             } else {
                 Toast.makeText(LoginActivity.this, R.string.biometric_error_no_hardware, Toast.LENGTH_SHORT).show();
             }
         });
-
-        cryptoManager = new CryptoManager.Builder()
-                .setActivity(this)
-                .setAlgorithm("AES")
-                .setBlockMode("CBC")
-                .setEncryptPadding("PKCS7Padding")
-                .setKeystoreAlias("BiometricLogin")
-                .build();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void bindBiometric(String username, String pwd) {
-        cryptoManager.bindBiometric(username, pwd, new BiometricListener() {
+    private void bindBiometric(String username, String pwd, String keyAlias, int authenticators) {
+        new CryptoManager.Builder()
+                .setActivity(this)
+                .setKeyAlias(keyAlias)
+                .setAlgorithm("AES")
+                .setBlockMode("CBC")
+                .setEncryptPadding("PKCS7Padding")
+                .setAuthenticators(authenticators)
+                .build().bindBiometric(username, pwd, new BiometricListener() {
             @Override
             public void onBindSuccess() {
                 Toast.makeText(LoginActivity.this, R.string.bind_biometric_success, Toast.LENGTH_SHORT).show();
@@ -158,9 +160,16 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void biometricLogin(String username) {
+    private void biometricLogin(String username, String keyAlias, int authenticators) {
         //先判断是否支持
-        cryptoManager.biometricLogin(username, new BiometricListener() {
+        new CryptoManager.Builder()
+                .setActivity(this)
+                .setKeyAlias(keyAlias)
+                .setAlgorithm("AES")
+                .setBlockMode("CBC")
+                .setEncryptPadding("PKCS7Padding")
+                .setAuthenticators(authenticators)
+                .build().biometricLogin(username, new BiometricListener() {
             @Override
             public void onBindSuccess() {
 
@@ -176,5 +185,19 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private int getAuthenticators(AppCompatCheckBox cbStrong, AppCompatCheckBox cbWeak, AppCompatCheckBox cbDc) {
+        int flag = 0;
+        if (cbStrong.isChecked()) {
+            flag |= BiometricManager.Authenticators.BIOMETRIC_STRONG;
+        }
+        if (cbWeak.isChecked()) {
+            flag |= BiometricManager.Authenticators.BIOMETRIC_WEAK;
+        }
+        if (cbDc.isChecked()) {
+            flag |= BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+        }
+        return flag;
     }
 }

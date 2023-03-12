@@ -5,24 +5,51 @@
 - Android 11(API 30)才支持拉起"生物识别注册页面"
 - Android 6(API 23) KeyProperties.KEY_ALGORITHM_AES、KeyProperties.PURPOSE_ENCRYPT、 KeyProperties.PURPOSE_DECRYPT
 
+## 衡量安全性
+
+### Class 3 
+对应代码: BiometricManager.Authenticators.BIOMETRIC_STRONG
+
+### Class 2
+对应代码: BiometricManager.Authenticators.BIOMETRIC_WEAK
+- BiometricPrompt.authenticate()不支持BiometricPrompt.CryptoObject(cipher)
+
+### Class 1 
+对应代码: BiometricManager.Authenticators.DEVICE_CREDENTIAL 
+- \>=Android 11(API 30) BiometricPrompt.authenticate()支持BiometricPrompt.CryptoObject(cipher)
+- Negative text must not be set if device credential authentication is allowed.    
+
 ## 实践
 
 ### 场景1
 
 机型: 小米Pad 5 Pro(Android 12)  
 
-BiometricManager.canAuthenticate(BiometricManager.Authenticators.DEVICE_CREDENTIAL)返回值为BiometricManager.BIOMETRIC_SUCCESS
-BiometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)返回值为BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE, 但是设备明明有"人脸解锁"功能
-BiometricPrompt.PromptInfo.setAllowedAuthenticators=true, 不能调用setNegativeButtonText, 否则调用build时报如下错误
-> Negative text must not be set if device credential authentication is allowed.
+- Class 3
+  - BiometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE, 但是设备配置了"人脸解锁"
+- Class 1
+  - BiometricManager.canAuthenticate(BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS
 
-机型: Oppo Reno3 元气版  
 
-BiometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)返回值为BiometricManager.BIOMETRIC_SUCCESS, 但是调用BiometricPrompt.authenticate仅拉起指纹识别  
+机型: Oppo Reno3 元气版
 
-机型: vivo S10 Pro(Android 11)  
+- Class 3
+  - BiometricPrompt.authenticate() 
+    - 配置了指纹、面容, 拉起指纹解锁
+    - 配置了指纹, 拉起指纹解锁
+- Class 2
+  - BiometricPrompt.authenticate() 
+    - 配置了指纹、面容, 拉起面容解锁
+    - 配置指纹, 拉起指纹解锁
+- Class 1
+  - BiometricPrompt.authenticate()
+    - 配置了指纹、面容, 拉起手势解锁, 授权成功之后, BiometricPrompt.AuthenticationResult中密钥未授权(抛出异常: Key user not authenticated)
+    - 配置了指纹, 拉起手势解锁
+    - 未配置指纹, 拉起手势解锁
 
-不支持KeyGenParameterSpec.Builder.setIsStrongBoxBacked(true)
+机型: vivo S10 Pro(Android 11)
+
+> 不支持KeyGenParameterSpec.Builder.setIsStrongBoxBacked(true)
 
 
 

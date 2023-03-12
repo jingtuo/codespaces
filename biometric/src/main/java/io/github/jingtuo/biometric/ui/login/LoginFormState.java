@@ -10,18 +10,22 @@ class LoginFormState {
     private Integer usernameError;
     @Nullable
     private Integer passwordError;
-    private boolean isDataValid;
 
-    LoginFormState(@Nullable Integer usernameError, @Nullable Integer passwordError) {
-        this.usernameError = usernameError;
-        this.passwordError = passwordError;
-        this.isDataValid = false;
-    }
+    @Nullable
+    private Integer keyAliasError;
+    private boolean isDataValid;
 
     LoginFormState(boolean isDataValid) {
         this.usernameError = null;
         this.passwordError = null;
         this.isDataValid = isDataValid;
+    }
+
+    LoginFormState(@Nullable Integer usernameError, @Nullable Integer passwordError, @Nullable Integer keyAliasError) {
+        this.usernameError = usernameError;
+        this.passwordError = passwordError;
+        this.keyAliasError = keyAliasError;
+        this.isDataValid = false;
     }
 
     @Nullable
