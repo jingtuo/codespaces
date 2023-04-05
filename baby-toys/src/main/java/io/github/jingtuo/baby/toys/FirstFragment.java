@@ -45,7 +45,6 @@ public class FirstFragment extends Fragment {
             @Override
             public void onStatusChanged(int recorderStatus, int playerStatus) {
                 if (replayToy.isRecording()) {
-                    //
                     binding.textviewFirst.setText(R.string.recording);
                 }
                 if (replayToy.isPlaying()) {
@@ -59,12 +58,12 @@ public class FirstFragment extends Fragment {
         binding.btnReplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (replayToy.isRecording() || replayToy.isPlaying()) {
-                    replayToy.stop();
-                    binding.btnReplay.setText(R.string.start);
-                } else {
+                if (replayToy.isStopped()) {
                     replayToy.start();
                     binding.btnReplay.setText(R.string.stop);
+                } else {
+                    replayToy.stop();
+                    binding.btnReplay.setText(R.string.start);
                 }
             }
         });

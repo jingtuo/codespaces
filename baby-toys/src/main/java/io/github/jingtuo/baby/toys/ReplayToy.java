@@ -42,24 +42,31 @@ public class ReplayToy implements Toy, MediaRecorder.OnInfoListener,
      */
     private static final int INITIAL = 1;
 
+    /**
+     * {@link MediaRecorder#setAudioSource(int)}之后变更为此状态
+     * {@link MediaPlayer#setDataSource(FileDescriptor)}之后变更为此状态
+     */
     private static final int INITIALIZED = 2;
 
+    /**
+     * {@link MediaRecorder}专用的状态, 设置encoder, outputFormat等之后
+     */
     private static final int DATA_SOURCE_CONFIGURED = 3;
 
     private static final int PREPARED = 4;
 
     /**
-     * {@link MediaPlayer}专有的状态
+     * {@link MediaPlayer}专用的状态
      */
     private static final int PREPARING = 5;
 
     /**
-     * {@link MediaRecorder}专有的状态
+     * {@link MediaRecorder}专用的状态
      */
     private static final int RECORDING = 6;
 
     /**
-     * {@link MediaPlayer}专有的状态
+     * {@link MediaPlayer}专用的状态
      */
     private static final int STARTED = 7;
 
@@ -184,11 +191,16 @@ public class ReplayToy implements Toy, MediaRecorder.OnInfoListener,
 
     @Override
     public void stop() {
-        if (NONE == recorderStatus || NONE == playerStatus) {
-            return;
+        if (RECORDING == recorderStatus) {
+            //停止录制
+            stopRecorder();
         }
-        releaseRecorder();
-        releasePlayer();
+        if (NONE != recorderStatus) {
+            releaseRecorder();
+        }
+        if (NONE != playerStatus) {
+            releasePlayer();
+        }
     }
 
     @Override
