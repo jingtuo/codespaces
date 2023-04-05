@@ -16,3 +16,4 @@ rootProject.name = "Codespaces"
 include ':app'
 include ':biometric'
 include ':fragment'
+include ':baby-toys'
