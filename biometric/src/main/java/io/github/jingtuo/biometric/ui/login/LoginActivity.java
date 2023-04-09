@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,10 +20,23 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import java.security.Provider;
+import java.security.Security;
+import java.util.Set;
+
 import io.github.jingtuo.biometric.R;
 import io.github.jingtuo.biometric.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String ALGORITHM = "AES";
+    private static final String BLOCK_MODE = "CBC";
+
+    private static final String ENCRYPT_PADDING = "PKCS7Padding";
+
+    private static final String TAG = "Login";
 
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
@@ -130,6 +144,35 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, R.string.biometric_error_no_hardware, Toast.LENGTH_SHORT).show();
             }
         });
+
+        Provider[] providers = Security.getProviders();
+        for (Provider item: providers) {
+            Log.i(TAG, "provider: " + item.getName() + ", info: " + item.getInfo());
+            Set<Provider.Service> services = item.getServices();
+            for (Provider.Service service: services) {
+                Log.i(TAG, "find service: " + item.getName());
+                if (service.getAlgorithm().startsWith("SM")) {
+                    Log.i(TAG, "find provider: " + item.getName() + ", algorithm: " +
+                            service.getAlgorithm());
+                }
+            }
+        }
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        Security.addProvider(new BouncyCastleProvider());
+        providers = Security.getProviders();
+        Log.i(TAG, "after modify");
+        for (Provider item: providers) {
+            Log.i(TAG, "provider: " + item.getInfo());
+            Set<Provider.Service> services = item.getServices();
+            for (Provider.Service service: services) {
+                if (service.getAlgorithm().startsWith("SM")) {
+                    Log.i(TAG, "find provider: " + item.getName()
+                            + ", algorithm: " + service.getAlgorithm()
+                            + ", type: " + service.getType()
+                            + ", class: " + service.getClassName());
+                }
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -137,9 +180,9 @@ public class LoginActivity extends AppCompatActivity {
         new CryptoManager.Builder()
                 .setActivity(this)
                 .setKeyAlias(keyAlias)
-                .setAlgorithm("AES")
-                .setBlockMode("CBC")
-                .setEncryptPadding("PKCS7Padding")
+                .setAlgorithm(ALGORITHM)
+                .setBlockMode(BLOCK_MODE)
+                .setEncryptPadding(ENCRYPT_PADDING)
                 .setAuthenticators(authenticators)
                 .build().bindBiometric(username, pwd, new BiometricListener() {
             @Override
@@ -165,11 +208,11 @@ public class LoginActivity extends AppCompatActivity {
         new CryptoManager.Builder()
                 .setActivity(this)
                 .setKeyAlias(keyAlias)
-                .setAlgorithm("AES")
-                .setBlockMode("CBC")
-                .setEncryptPadding("PKCS7Padding")
+                .setAlgorithm(ALGORITHM)
+                .setBlockMode(BLOCK_MODE)
+                .setEncryptPadding(ENCRYPT_PADDING)
                 .setAuthenticators(authenticators)
-                .build().biometricLogin(username, new BiometricListener() {
+                .build().biometricLogin(username, authenticators, new BiometricListener() {
             @Override
             public void onBindSuccess() {
 

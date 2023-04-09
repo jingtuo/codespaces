@@ -57,18 +57,7 @@
 
 以下算法已经验证: 
 - AES + CBC + PKCS7Padding
- 
-## 相关知识
-
-- Security.getProviders: 
-  - AndroidNSSP
-  - AndroidOpenSSL
-  - CertPathProvider
-  - AndroidKeyStoreBCWorkaround
-  - BC
-  - HarmonyJSSE
-  - AndroidKeyStore
-
+- SM4 + CBC + PKCS7Padding
 ### 安全
 
 - AndroidKeyStore 

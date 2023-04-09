@@ -16,14 +16,30 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import org.bouncycastle.crypto.KeyGenerationParameters;
+import org.bouncycastle.crypto.engines.SM4Engine;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.CipherSpi;
+import org.bouncycastle.jcajce.provider.digest.SM3;
+import org.bouncycastle.jcajce.provider.symmetric.SM4;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.Provider;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
+import java.util.Set;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import io.github.jingtuo.biometric.R;
 
@@ -36,7 +52,7 @@ public class CryptoManager {
 
     private static final String TAG = "Crypto";
 
-    private static final String PROVIDER_ANDROID_KEY_STORE = "AndroidKeyStore";
+    private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
 
     private static final String PREFERENCE_NAME = "Biometric";
 
@@ -221,27 +237,26 @@ public class CryptoManager {
      * @param username 用户名
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void biometricLogin(String username, BiometricListener biometricListener) {
+    public void biometricLogin(String username, int authenticators, BiometricListener biometricListener) {
         String ivStr = preferences.getString(username + "_iv", "");
-        if (TextUtils.isEmpty(ivStr)) {
-            //尚未绑定
-            if (biometricListener != null) {
-                biometricListener.onAuthFailure(ERROR_NONE_BIND, activity.getString(R.string.biometric_error_none_bind));
-            }
-            return;
-        }
+        Log.i(TAG, "biometricLogin: " + ivStr);
         //先判断是否支持
         if (biometricManager == null) {
             biometricManager = BiometricManager.from(activity);
         }
-        int flag = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG);
+        int flag = biometricManager.canAuthenticate(authenticators);
         if (BiometricManager.BIOMETRIC_SUCCESS == flag) {
             //支持生物认证
             Cipher cipher;
             try {
                 cipher = Cipher.getInstance(algorithm + "/" + blockMode + "/" + encryptPadding);
-                byte[] iv = Base64.decode(ivStr, Base64.NO_WRAP);
-                cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), new IvParameterSpec(iv));
+                AlgorithmParameters parameters = AlgorithmParameters.getInstance(algorithm);
+                if (TextUtils.isEmpty(ivStr)) {
+                    cipher.init(Cipher.DECRYPT_MODE, getSecretKey());
+                } else {
+                    byte[] iv = Base64.decode(ivStr, Base64.NO_WRAP);
+                    cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), new IvParameterSpec(iv));
+                }
             } catch (Exception e) {
                 Log.i(TAG, e.getMessage());
                 if (biometricListener != null) {
@@ -305,14 +320,11 @@ public class CryptoManager {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private SecretKey getSecretKey() throws Exception {
-        KeyStore keyStore = KeyStore.getInstance(PROVIDER_ANDROID_KEY_STORE);
+        KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
         // Before the keystore can be accessed, it must be loaded.
         keyStore.load(null);
-        Log.i(TAG, "keyAlias: " + keyAlias + ", " + authenticators);
-        Log.i(TAG, "cryptoIsSupported: " + cryptoIsSupported(authenticators));
         Key key = keyStore.getKey(keyAlias, null);
         if (key != null) {
-            Log.i(TAG, "keyAlias: " + keyAlias + ", exists");
             return (SecretKey) key;
         }
         KeyGenParameterSpec.Builder build = new KeyGenParameterSpec.Builder(keyAlias,
@@ -334,10 +346,10 @@ public class CryptoManager {
 //        } else {
 //            build.setUserAuthenticationValidityDurationSeconds(5);
 //        }
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm,
-                PROVIDER_ANDROID_KEY_STORE);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
         keyGenerator.init(build.build());
-        return keyGenerator.generateKey();
+        SecretKey secretKey = keyGenerator.generateKey();
+        return secretKey;
     }
 
     public static class Builder {
@@ -403,9 +415,16 @@ public class CryptoManager {
         try {
             byte[] buffer = cipher.doFinal(pwd.getBytes(StandardCharsets.UTF_8));
             byte[] iv = cipher.getIV();
-            preferences.edit().putString(username, Base64.encodeToString(buffer, Base64.NO_WRAP))
-                    .putString(username + "_iv", Base64.encodeToString(iv, Base64.NO_WRAP))
-                    .apply();
+            Log.i(TAG, "pwd encrypt: " + Base64.encodeToString(buffer, Base64.NO_WRAP));
+            SharedPreferences.Editor editor = preferences.edit()
+                    .putString(username, Base64.encodeToString(buffer, Base64.NO_WRAP));
+            if (iv != null) {
+                //SM4 没有偏移量
+                String ivStr = Base64.encodeToString(iv, Base64.NO_WRAP);
+                Log.i(TAG, "ivStr: " + ivStr);
+                editor.putString(username + "_iv", ivStr);
+            }
+            editor.apply();
             if (biometricListener != null) {
                 biometricListener.onBindSuccess();
             }
@@ -437,6 +456,7 @@ public class CryptoManager {
     private void getPwd(Cipher cipher, String username, BiometricListener biometricListener) {
         try {
             String cipherPwd = preferences.getString(username, "");
+            Log.i(TAG, "pwd encrypt: " + cipherPwd);
             byte[] buffer = cipher.doFinal(Base64.decode(cipherPwd, Base64.NO_WRAP));
             String pwd = new String(buffer, StandardCharsets.UTF_8);
             if (biometricListener != null) {
