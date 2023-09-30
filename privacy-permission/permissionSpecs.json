@@ -1,0 +1,23 @@
+[
+  {
+    "name": "runningProcess",
+    "clsName": "android.app.ActivityManager",
+    "isField": false,
+    "methodName": "getRunningAppProcesses",
+    "methodReturnType": "java.util.List"
+  },
+  {
+    "name": "runningServices",
+    "clsName": "android.app.ActivityManager",
+    "isField": false,
+    "methodName": "getRunningServices",
+    "methodReturnType": "java.util.List"
+  },
+  {
+    "name": "runningTasks",
+    "clsName": "android.app.ActivityManager",
+    "isField": false,
+    "methodName": "getRunningTasks",
+    "methodReturnType": "java.util.List"
+  }
+]

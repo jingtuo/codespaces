@@ -21,6 +21,17 @@
 
 1. 即使不依赖kotlin进行开发, 打出来的应用包(apk)依然会包含kotlin目录
 
+## Kotlin
+
+### Coroutine
+
+1. Coroutine类似线程, 但又跟线程不同
+2. It may suspend its execution in one thread and resume in another one.
+
+关键词:
+1. launch负责定义Coroutine的工作内容, 同一作用域下的多个launch是并发运行
+2. runBlocking负责定义Coroutine的作用域, 可能会阻断当前线程
+3. coroutineScope负责定义Coroutine的作用域, 只可以被另一个作用域调用, 或者被suspend函数调用
 
 ## 安全(Security)
 
@@ -41,5 +52,11 @@
 1. 使用KeyGenerator.getInstance(algorithm, provider)生成SM4的密钥KEY, 遇到错误: java.security.InvalidAlgorithmParameterException: Not Implemented  
    暂时未明白: JceSecurity.getInstance("KeyGenerator", KeyGeneratorSpi.class, algorithm, provider)找到的是BaseKeyGenerator
 
+## 参考文献
+
+- [Android Kotlin Start](https://developer.android.google.cn/kotlin/get-started)
+- [Android Kotlin Learn](https://developer.android.google.cn/kotlin/learn)
+- [Android KTX](https://developer.android.google.cn/kotlin/ktx)
+- [Shrink Code](https://developer.android.google.cn/studio/build/shrink-code.html?hl=en)
 
 

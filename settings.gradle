@@ -1,10 +1,22 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
         gradlePluginPortal()
     }
 }
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.github.jingtuo:privacy-permission:0.0.1-SNAPSHOT"
+    }
+}
+
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -17,3 +29,4 @@ include ':app'
 include ':biometric'
 include ':fragment'
 include ':tool'
+include ':privacy-permission'
