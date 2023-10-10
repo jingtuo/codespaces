@@ -54,6 +54,9 @@ gradlePlugin {
 dependencies {
 //    implementation group: 'org.ow2.asm', name: 'asm-analysis', version: '9.5'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    implementation 'org.apache.poi:poi:5.2.4'
+    implementation 'org.apache.poi:poi-ooxml:5.2.4'
 }
 
 // 发布到本地

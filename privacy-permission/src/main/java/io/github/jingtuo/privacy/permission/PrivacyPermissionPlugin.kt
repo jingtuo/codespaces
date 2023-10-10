@@ -19,9 +19,10 @@ class PrivacyPermissionPlugin: Plugin<Project> {
             //设置分组
             it.group = "verification"
             it.getCmdlineToolsDir().set(extension.getCmdlineToolsDir())
-            it.getApkFile().set(extension.getApkFile())
+            it.getApkFilePath().set(extension.getApkFilePath())
+            it.getMappingFilePath().set(extension.getMappingFilePath())
             it.getPermissionSpecsFile().set(extension.getPermissionSpecsFile())
-            it.getMappingFilePath().set(extension.mappingFilePath)
+            it.getOutputFile().set(extension.getOutputFile())
         }
     }
 

@@ -1,23 +1,57 @@
 [
   {
-    "name": "runningProcess",
+    "name": "应用进程",
     "clsName": "android.app.ActivityManager",
     "isField": false,
     "methodName": "getRunningAppProcesses",
     "methodReturnType": "java.util.List"
   },
   {
-    "name": "runningServices",
+    "name": "应用服务",
     "clsName": "android.app.ActivityManager",
     "isField": false,
     "methodName": "getRunningServices",
+    "paramTypes": ["int"],
     "methodReturnType": "java.util.List"
   },
   {
-    "name": "runningTasks",
+    "name": "应用任务",
     "clsName": "android.app.ActivityManager",
     "isField": false,
     "methodName": "getRunningTasks",
+    "paramTypes": ["int"],
     "methodReturnType": "java.util.List"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["String", "int"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["String", "android.content.pm.PackageManager.PackageInfoFlags"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["android.content.pm.VersionedPackage", "android.content.pm.PackageManager.PackageInfoFlags"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["android.content.pm.VersionedPackage", "int"],
+    "methodReturnType": "android.content.pm.PackageInfo"
   }
 ]

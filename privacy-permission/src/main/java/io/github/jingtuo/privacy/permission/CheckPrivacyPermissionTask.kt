@@ -1,8 +1,16 @@
 package io.github.jingtuo.privacy.permission
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.VerticalAlignment
+import org.apache.poi.xssf.streaming.SXSSFCell
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -10,10 +18,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileWriter
 import java.io.InputStreamReader
 import java.lang.StringBuilder
 
@@ -31,8 +43,8 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
     /**
      * apk文件
      */
-    @InputFile
-    abstract fun getApkFile(): RegularFileProperty
+    @Input
+    abstract fun getApkFilePath(): Property<String>
 
     /**
      * mapping文件
@@ -45,6 +57,9 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
      */
     @InputFile
     abstract fun getPermissionSpecsFile(): RegularFileProperty
+
+    @OutputFile
+    abstract fun getOutputFile(): RegularFileProperty
 
     @OptIn(ExperimentalSerializationApi::class)
     @TaskAction
@@ -82,18 +97,19 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         } else {
             "${cmdlineToolsHome}${File.separator}bin${File.separator}$commandName"
         }
-        println("command: $command")
         //将错误输出流合并到标准输出流
-        val apkFilePath = getApkFile().get().asFile.path
+        val apkFilePath = getApkFilePath().get()
         val allDex = getAllDex(command, apkFilePath)
         for (item in allDex) {
             println("dex: $item")
         }
         val mappingFilePath = getMappingFilePath().get()
-        val permissionSpecs: List<PermissionSpec> = Json.decodeFromStream(
-            FileInputStream(getPermissionSpecsFile().get().asFile)
-        )
-        permissionSpecs.map {
+        var permissionSpecs: List<PermissionSpec>?
+        FileInputStream(getPermissionSpecsFile().get().asFile).use {
+            permissionSpecs = Json.decodeFromStream(it)
+        }
+        println("convert permissionSpecs to dex code: ")
+        permissionSpecs?.map {
             var matchContent = "L${it.clsName.replace("\\.", "/")};->"
             matchContent += if (it.isField) {
                 "${it.fieldName}:${getDexType(it.fieldType)}"
@@ -104,24 +120,66 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             matchContent
         }
 
-        val referencesTos = permissionSpecs.map {
-            if (it.isField) {
-                it.clsName + " " + it.fieldType + " " + it.fieldName
-            } else {
-                it.clsName + " " + it.methodReturnType + " " + it.methodName + "()"
+        val threadName = Thread.currentThread().name
+        val map = mutableMapOf<String, List<List<String>>>()
+        runBlocking {
+            permissionSpecs?.let {
+                for (item in it) {
+                    launch(Dispatchers.IO) {
+                        val subTreadName = Thread.currentThread().name
+                        val referencesTo = item.getReferencesTo()
+                        val startTime = System.currentTimeMillis()
+                        println("find reference($referencesTo) start on thread: $subTreadName")
+                        val referenceTree = getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
+                        map[referencesTo] = referenceTree
+                        println("find reference($referencesTo) end cost time(${System.currentTimeMillis() - startTime}) on thread: $subTreadName")
+                    }
+                }
             }
         }
-
-        for (referencesTo in referencesTos) {
-            val referenceTree = getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
-            println(referencesTo)
-            println("---start---")
-            println(referenceTree)
-            println("---end---")
+        //由于csv无法满足单元格内换行, 引入poi
+        val wb = SXSSFWorkbook(100)
+        val stackStyle = wb.createCellStyle()
+        stackStyle.alignment = HorizontalAlignment.LEFT
+        stackStyle.verticalAlignment = VerticalAlignment.CENTER
+        stackStyle.wrapText = false
+        stackStyle.shrinkToFit = false
+        FileOutputStream(getOutputFile().get().asFile).use { stream ->
+            permissionSpecs?.let { permissions ->
+                for (permission in permissions) {
+                    //创建Sheet, 考虑一个sheet的行数有上限, 按照权限名分在多个sheet中
+                    var sheet = wb.getSheet(permission.name)
+                    if (sheet == null) {
+                        sheet = wb.createSheet(permission.name)
+                        //创建标题
+                        val titleRow = sheet.createRow(0)
+                        val titleCell = titleRow.createCell(0, CellType.STRING)
+                        titleCell.setCellValue("堆栈")
+                    }
+                    val referencesTo = permission.getReferencesTo()
+                    val list = map[referencesTo]
+                    var rowIndex = 1
+                    list?.let {
+                        for (stack in it) {
+                            var str = ""
+                            for ((index,line) in stack.withIndex()) {
+                                str += line
+                                if (index != stack.size - 1) {
+                                    str += "\n"
+                                }
+                            }
+                            val itemRow = sheet.createRow(rowIndex++)
+                            val stackCell = itemRow.createCell(0, CellType.STRING)
+                            stackCell.cellStyle = stackStyle
+                            stackCell.setCellValue(str)
+                        }
+                    }
+                }
+            }
+            wb.write(stream)
         }
-
-        println("task apk file: ${getApkFile().get().asFile.path}")
-        println("buildDir: ${project.buildDir}")
+        wb.dispose()
+        println("complete on thread: $threadName")
     }
 
     private fun getAllDex(command: String, apkFilePath: String): List<String> {
@@ -206,25 +264,67 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         else -> javaType.replace("\\.", "/")
     }
 
+    /**
+     * 示例:
+     * android.app.ActivityManager java.util.List getRunningAppProcesses()
+     *  androidx.work.impl.utils.ProcessUtils java.lang.String getProcessName(android.content.Context)
+     *   androidx.work.impl.utils.ProcessUtils boolean isDefaultProcess(android.content.Context,androidx.work.Configuration)
+     *    androidx.work.impl.background.greedy.GreedyScheduler void checkDefaultProcess()
+     *     androidx.work.impl.background.greedy.GreedyScheduler void cancel(java.lang.String)
+     *     androidx.work.impl.background.greedy.GreedyScheduler void schedule(androidx.work.impl.model.WorkSpec[])
+     *      androidx.work.impl.background.greedy.DelayedWorkTracker$1 void run()
+     *    androidx.work.impl.utils.ForceStopRunnable boolean multiProcessChecks()
+     *     androidx.work.impl.utils.ForceStopRunnable void run()
+     */
     private fun getReferenceTree(
         command: String, apkFilePath: String, mappingFilePath: String,
         referencesTo: String
-    ): String {
+    ): List<List<String>> {
         val process = ProcessBuilder(
             command, "dex", "reference-tree", "--references-to", referencesTo,
             "--proguard-mappings", mappingFilePath, apkFilePath
         )
             .inheritIO()
-            .redirectErrorStream(true)
             .start()
-        val result = StringBuilder()
+        val result = mutableListOf<List<String>>()
+        var curStack = mutableListOf<String>()
+        var curCount = 0
         BufferedReader(InputStreamReader(process.inputStream)).use {
             while (true) {
-                val line = it.readLine() ?: break
-                result.append(line).append("\n")
+                val line = it.readLine()
+                if (line == null) {
+                    result.add(curStack)
+                    break
+                }
+                val count = line.countStartsWith(' ')
+                if (0 == count) {
+                    //首行
+                    curStack = mutableListOf()
+                    curStack.add(line)
+                } else {
+                    if (count <= curCount) {
+                        //新的引用入口, 保存之前的堆栈
+                        result.add(curStack)
+                        //取集合的第0个索引到第endIndex个元素(包含endIndex)
+                        val endIndex = count - 1
+                        curStack = curStack.slice(0..endIndex).toMutableList()
+                    }
+                    curStack.add(line.trimStart())
+                }
+                curCount = count
             }
         }
+        var error = ""
+        BufferedReader(InputStreamReader(process.errorStream)).use {
+            while (true) {
+                val line = it.readLine() ?: break
+                error += "$line\n"
+            }
+        }
+        if (!error.isNullOrEmpty()) {
+            println("$referencesTo error:\n$error " )
+        }
         process.destroy()
-        return result.toString()
+        return result
     }
 }
