@@ -130,55 +130,17 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                         val referencesTo = item.getReferencesTo()
                         val startTime = System.currentTimeMillis()
                         println("find reference($referencesTo) start on thread: $subTreadName")
-                        val referenceTree = getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
+                        val referenceTree =
+                            getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
                         map[referencesTo] = referenceTree
                         println("find reference($referencesTo) end cost time(${System.currentTimeMillis() - startTime}) on thread: $subTreadName")
                     }
                 }
             }
         }
-        //由于csv无法满足单元格内换行, 引入poi
-        val wb = SXSSFWorkbook(100)
-        val stackStyle = wb.createCellStyle()
-        stackStyle.alignment = HorizontalAlignment.LEFT
-        stackStyle.verticalAlignment = VerticalAlignment.CENTER
-        stackStyle.wrapText = false
-        stackStyle.shrinkToFit = false
-        FileOutputStream(getOutputFile().get().asFile).use { stream ->
-            permissionSpecs?.let { permissions ->
-                for (permission in permissions) {
-                    //创建Sheet, 考虑一个sheet的行数有上限, 按照权限名分在多个sheet中
-                    var sheet = wb.getSheet(permission.name)
-                    if (sheet == null) {
-                        sheet = wb.createSheet(permission.name)
-                        //创建标题
-                        val titleRow = sheet.createRow(0)
-                        val titleCell = titleRow.createCell(0, CellType.STRING)
-                        titleCell.setCellValue("堆栈")
-                    }
-                    val referencesTo = permission.getReferencesTo()
-                    val list = map[referencesTo]
-                    var rowIndex = 1
-                    list?.let {
-                        for (stack in it) {
-                            var str = ""
-                            for ((index,line) in stack.withIndex()) {
-                                str += line
-                                if (index != stack.size - 1) {
-                                    str += "\n"
-                                }
-                            }
-                            val itemRow = sheet.createRow(rowIndex++)
-                            val stackCell = itemRow.createCell(0, CellType.STRING)
-                            stackCell.cellStyle = stackStyle
-                            stackCell.setCellValue(str)
-                        }
-                    }
-                }
-            }
-            wb.write(stream)
+        permissionSpecs?.let {
+            export(it, map)
         }
-        wb.dispose()
         println("complete on thread: $threadName")
     }
 
@@ -322,9 +284,72 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             }
         }
         if (!error.isNullOrEmpty()) {
-            println("$referencesTo error:\n$error " )
+            println("$referencesTo error:\n$error ")
         }
         process.destroy()
         return result
+    }
+
+    /**
+     * 导出数据
+     */
+    private fun export(permissionSpecs: List<PermissionSpec>, map: Map<String, List<List<String>>>) {
+        //由于csv无法满足单元格内换行, 引入poi
+        val wb = SXSSFWorkbook(100)
+        val stackStyle = wb.createCellStyle()
+        stackStyle.alignment = HorizontalAlignment.LEFT
+        stackStyle.verticalAlignment = VerticalAlignment.CENTER
+        stackStyle.wrapText = true
+        stackStyle.shrinkToFit = false
+        FileOutputStream(getOutputFile().get().asFile).use { stream ->
+            permissionSpecs?.let { permissions ->
+                for (permission in permissions) {
+                    //创建Sheet, 考虑一个sheet的行数有上限, 按照权限名分在多个sheet中
+                    var sheet = wb.getSheet(permission.name)
+                    if (sheet == null) {
+                        sheet = wb.createSheet(permission.name)
+                        //创建标题
+                        val titleRow = sheet.createRow(0)
+                        val titleCell = titleRow.createCell(0, CellType.STRING)
+                        titleCell.setCellValue("堆栈")
+                    }
+                    println("sheet: ${sheet.sheetName}, ${sheet.lastRowNum}")
+                    val referencesTo = permission.getReferencesTo()
+                    val list = map[referencesTo]
+                    var rowIndex = sheet.lastRowNum + 1
+                    //用于设置列的宽度
+                    var textMaxWidth = 0
+                    list?.let {
+                        for (stack in it) {
+                            var str = ""
+                            for ((index, line) in stack.withIndex()) {
+                                if (line.length > textMaxWidth) {
+                                    textMaxWidth = line.length
+                                }
+                                str += line
+                                if (index != stack.size - 1) {
+                                    str += "\n"
+                                }
+                            }
+                            val itemRow = sheet.createRow(rowIndex++)
+//                            itemRow.height = (stack.size * 20).toShort()
+                            val stackCell = itemRow.createCell(0, CellType.STRING)
+                            stackCell.cellStyle = stackStyle
+                            stackCell.setCellValue(str)
+                        }
+                    }
+                    var columnWidth = sheet.getColumnWidth(0)
+                    //一个字符宽度是256
+                    columnWidth = columnWidth.coerceAtLeast(textMaxWidth * 256)
+                    //支持的最大字符个数: 255
+                    columnWidth = columnWidth.coerceAtMost(255 * 256)
+                    println("column width: ${columnWidth / 256}")
+                    //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
+                    sheet.setColumnWidth(0, columnWidth)
+                }
+            }
+            wb.write(stream)
+        }
+        wb.dispose()
     }
 }

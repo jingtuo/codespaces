@@ -27,7 +27,7 @@
     "clsName": "android.content.pm.PackageManager",
     "isField": false,
     "methodName": "getPackageInfo",
-    "paramTypes": ["String", "int"],
+    "paramTypes": ["java.lang.String", "int"],
     "methodReturnType": "android.content.pm.PackageInfo"
   },
   {
@@ -35,7 +35,7 @@
     "clsName": "android.content.pm.PackageManager",
     "isField": false,
     "methodName": "getPackageInfo",
-    "paramTypes": ["String", "android.content.pm.PackageManager.PackageInfoFlags"],
+    "paramTypes": ["java.lang.String", "android.content.pm.PackageManager$PackageInfoFlags"],
     "methodReturnType": "android.content.pm.PackageInfo"
   },
   {
@@ -43,7 +43,7 @@
     "clsName": "android.content.pm.PackageManager",
     "isField": false,
     "methodName": "getPackageInfo",
-    "paramTypes": ["android.content.pm.VersionedPackage", "android.content.pm.PackageManager.PackageInfoFlags"],
+    "paramTypes": ["android.content.pm.VersionedPackage", "android.content.pm.PackageManager$PackageInfoFlags"],
     "methodReturnType": "android.content.pm.PackageInfo"
   },
   {
