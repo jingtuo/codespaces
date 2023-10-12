@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Process
 import android.util.Log
+import java.security.Security
 
 class App : Application() {
 

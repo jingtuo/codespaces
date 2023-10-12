@@ -53,5 +53,79 @@
     "methodName": "getPackageInfo",
     "paramTypes": ["android.content.pm.VersionedPackage", "int"],
     "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "外部存储信息",
+    "clsName": "android.os.Environment",
+    "isField": false,
+    "methodName": "getExternalStorageDirectory",
+    "methodReturnType": "java.io.File"
+  },
+  {
+    "name": "外部存储信息",
+    "clsName": "android.os.Environment",
+    "isField": false,
+    "methodName": "getExternalStoragePublicDirectory",
+    "paramTypes": ["java.lang.String"],
+    "methodReturnType": "java.io.File"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getDeviceId",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getDeviceId",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getImei",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getImei",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getLine1Number",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getMeid",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getMeid",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息",
+    "clsName": "android.provider.Settings$Secure",
+    "isField": true,
+    "fieldName": "ANDROID_ID",
+    "fieldType": "java.lang.String"
   }
 ]
