@@ -22,7 +22,7 @@ class PrivacyPermissionPlugin: Plugin<Project> {
             it.getApkFilePath().set(extension.getApkFilePath())
             it.getMappingFilePath().set(extension.getMappingFilePath())
             it.getPermissionSpecsFile().set(extension.getPermissionSpecsFile())
-            it.getOutputFile().set(extension.getOutputFile())
+            it.getOutputDir().set(extension.getOutputDir())
         }
     }
 

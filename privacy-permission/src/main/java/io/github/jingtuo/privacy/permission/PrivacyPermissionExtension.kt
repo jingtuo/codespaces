@@ -6,6 +6,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 
 /**
@@ -37,8 +38,8 @@ abstract class PrivacyPermissionExtension {
     @InputFile
     abstract fun getPermissionSpecsFile(): RegularFileProperty
 
-    @OutputFile
-    abstract fun getOutputFile(): RegularFileProperty
+    @OutputDirectory
+    abstract fun getOutputDir(): DirectoryProperty
 
 
 }

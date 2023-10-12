@@ -18,6 +18,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.BufferedReader
@@ -58,14 +59,14 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
     @InputFile
     abstract fun getPermissionSpecsFile(): RegularFileProperty
 
-    @OutputFile
-    abstract fun getOutputFile(): RegularFileProperty
+    @OutputDirectory
+    abstract fun getOutputDir(): DirectoryProperty
 
     @OptIn(ExperimentalSerializationApi::class)
     @TaskAction
     fun execute() {
         val currentThreadName = Thread.currentThread().name
-        //默认线程: Execution worker
+        //默认线程: Execution worker Thread 7
         println("check privacy permission start on thread : $currentThreadName")
         val startTime = System.currentTimeMillis()
         val cmdlineToolsHome = getCmdlineToolsDir().get().asFile.path
@@ -118,29 +119,26 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             println(matchContent)
             matchContent
         }
-
-        val map = mutableMapOf<String, List<List<String>>>()
+        val folder = getOutputDir().get().asFile
         runBlocking {
             permissionSpecs?.let {
-                for (item in it) {
+                for ((index, item) in it.withIndex()) {
                     //使用Dispatchers.Default、Dispatchers.IO分配的线程如下:
                     //DefaultDispatcher-worker-1、DefaultDispatcher-worker-2
-                    launch(Dispatchers.IO) {
-                        val subTreadName = Thread.currentThread().name
-                        val referencesTo = item.getReferencesTo()
-                        val startTime = System.currentTimeMillis()
-                        println("find reference($referencesTo) start on thread: $subTreadName")
-                        val referenceTree =
-                            getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
-                        map[referencesTo] = referenceTree
-                        println("find reference($referencesTo) end cost time(${System.currentTimeMillis() - startTime}) on thread: $subTreadName")
-                    }
+                    //考虑自己机器的内存不足, 此处不适用并行
+                    val findStartTime = System.currentTimeMillis()
+                    val referencesTo = item.getReferencesTo()
+                    println("find reference($index, ${item.name}) start on thread: $currentThreadName")
+                    val referenceTree =
+                        getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
+                    export(folder, index, item, referenceTree)
+                    println("find reference($index, ${item.name}) end cost time(${System.currentTimeMillis() - findStartTime}) on thread: $currentThreadName")
                 }
             }
         }
-        permissionSpecs?.let {
-            export(it, map)
-        }
+//        permissionSpecs?.let {
+//            export(it, map)
+//        }
         println("check privacy permission end cost ${System.currentTimeMillis() - startTime} on thread : $currentThreadName")
     }
 
@@ -300,24 +298,28 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         permissionSpecs: List<PermissionSpec>,
         map: Map<String, List<List<String>>>
     ) {
-        //由于csv无法满足单元格内换行, 引入poi
-        val wb = SXSSFWorkbook(100)
-        val stackStyle = wb.createCellStyle()
-        stackStyle.alignment = HorizontalAlignment.LEFT
-        stackStyle.verticalAlignment = VerticalAlignment.CENTER
-        stackStyle.wrapText = true
-        stackStyle.shrinkToFit = false
-        FileOutputStream(getOutputFile().get().asFile).use { stream ->
-            for (permission in permissionSpecs) {
-                //创建Sheet, 考虑一个sheet的行数有上限, 按照权限名分在多个sheet中
-                var sheet = wb.getSheet(permission.name)
-                if (sheet == null) {
-                    sheet = wb.createSheet(permission.name)
-                    //创建标题
-                    val titleRow = sheet.createRow(0)
-                    val titleCell = titleRow.createCell(0, CellType.STRING)
-                    titleCell.setCellValue("堆栈")
-                }
+        val folder = getOutputDir().get().asFile
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+        for ((pIndex, permission) in permissionSpecs.withIndex()) {
+            //由于将所有权限写在一个文件中, 会出现Java内存不足, 所以将每个权限写一个文件
+            //由于csv无法满足单元格内换行, 引入poi
+            val wb = SXSSFWorkbook(100)
+            val stackStyle = wb.createCellStyle()
+            stackStyle.alignment = HorizontalAlignment.LEFT
+            stackStyle.verticalAlignment = VerticalAlignment.CENTER
+            stackStyle.wrapText = true
+            stackStyle.shrinkToFit = false
+            FileOutputStream(
+                File(folder, permission.name + "-$pIndex.xlsx")
+            ).use { stream ->
+                //创建Sheet
+                val sheet = wb.createSheet(permission.name)
+                //创建标题
+                val titleRow = sheet.createRow(0)
+                val titleCell = titleRow.createCell(0, CellType.STRING)
+                titleCell.setCellValue("堆栈")
                 val referencesTo = permission.getReferencesTo()
                 val list = map[referencesTo]
                 var rowIndex = sheet.lastRowNum + 1
@@ -326,12 +328,12 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                 list?.let {
                     for (stack in it) {
                         var str = ""
-                        for ((index, line) in stack.withIndex()) {
+                        for ((sIndex, line) in stack.withIndex()) {
                             if (line.length > textMaxWidth) {
                                 textMaxWidth = line.length
                             }
                             str += line
-                            if (index != stack.size - 1) {
+                            if (sIndex != stack.size - 1) {
                                 str += "\n"
                             }
                         }
@@ -342,14 +344,55 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                         stackCell.setCellValue(str)
                     }
                 }
-                var columnWidth = sheet.getColumnWidth(0)
-                //一个字符宽度是256
-                columnWidth = columnWidth.coerceAtLeast(textMaxWidth * 256)
-                //支持的最大字符个数: 255
-                columnWidth = columnWidth.coerceAtMost(255 * 256)
+                //一个字符宽度是256, 支持的最大字符个数: 255
+                var columnWidth = textMaxWidth.coerceAtMost(255) * 256
                 //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
                 sheet.setColumnWidth(0, columnWidth)
+                wb.write(stream)
             }
+            wb.dispose()
+        }
+    }
+
+    private fun export(folder: File, index: Int, permissionSpec: PermissionSpec, referenceTree: List<List<String>>) {
+        val wb = SXSSFWorkbook(100)
+        val stackStyle = wb.createCellStyle()
+        stackStyle.alignment = HorizontalAlignment.LEFT
+        stackStyle.verticalAlignment = VerticalAlignment.CENTER
+        stackStyle.wrapText = true
+        stackStyle.shrinkToFit = false
+        FileOutputStream(
+            File(folder, permissionSpec.name + "-$index.xlsx")
+        ).use { stream ->
+            //创建Sheet
+            val sheet = wb.createSheet(permissionSpec.name)
+            //创建标题
+            val titleRow = sheet.createRow(0)
+            val titleCell = titleRow.createCell(0, CellType.STRING)
+            titleCell.setCellValue("堆栈")
+            var rowIndex = sheet.lastRowNum + 1
+            //用于设置列的宽度
+            var textMaxWidth = 0
+            for (stack in referenceTree) {
+                var str = ""
+                for ((sIndex, line) in stack.withIndex()) {
+                    if (line.length > textMaxWidth) {
+                        textMaxWidth = line.length
+                    }
+                    str += line
+                    if (sIndex != stack.size - 1) {
+                        str += "\n"
+                    }
+                }
+                val itemRow = sheet.createRow(rowIndex++)
+                val stackCell = itemRow.createCell(0, CellType.STRING)
+                stackCell.cellStyle = stackStyle
+                stackCell.setCellValue(str)
+            }
+            //一个字符宽度是256, 支持的最大字符个数: 255
+            val columnWidth = textMaxWidth.coerceAtMost(255) * 256
+            //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
+            sheet.setColumnWidth(0, columnWidth)
             wb.write(stream)
         }
         wb.dispose()
