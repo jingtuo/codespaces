@@ -1,15 +1,11 @@
 package io.github.jingtuo.privacy.permission
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.VerticalAlignment
-import org.apache.poi.xssf.streaming.SXSSFCell
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -19,14 +15,11 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.BufferedReader
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.FileWriter
 import java.io.InputStreamReader
 import java.lang.StringBuilder
 
@@ -67,7 +60,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
     fun execute() {
         val currentThreadName = Thread.currentThread().name
         //默认线程: Execution worker Thread 7
-        println("check privacy permission start on thread : $currentThreadName")
+        println("check privacy permission start on main thread : $currentThreadName")
         val startTime = System.currentTimeMillis()
         val cmdlineToolsHome = getCmdlineToolsDir().get().asFile.path
         //Windows 11
@@ -120,20 +113,22 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             matchContent
         }
         val folder = getOutputDir().get().asFile
-        runBlocking {
-            permissionSpecs?.let {
-                for ((index, item) in it.withIndex()) {
-                    //使用Dispatchers.Default、Dispatchers.IO分配的线程如下:
-                    //DefaultDispatcher-worker-1、DefaultDispatcher-worker-2
-                    //考虑自己机器的内存不足, 此处不适用并行
-                    val findStartTime = System.currentTimeMillis()
-                    val referencesTo = item.getReferencesTo()
-                    println("find reference($index, ${item.name}) start on thread: $currentThreadName")
-                    val referenceTree =
-                        getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
-                    export(folder, index, item, referenceTree)
-                    println("find reference($index, ${item.name}) end cost time(${System.currentTimeMillis() - findStartTime}) on thread: $currentThreadName")
-                }
+        permissionSpecs?.let {
+            for ((index, item) in it.withIndex()) {
+                //使用Dispatchers.IO分配的线程数不受限制
+                //暂时未搞明白, 怎么在Gradle中用协程, 暂时用单线程
+                //考虑自己机器的内存不足, 此处限定4个线程并发
+                val findStartTime = System.currentTimeMillis()
+                val referencesTo = item.getReferencesTo()
+                println("find reference($index, ${item.name}) start on thread: $currentThreadName")
+                val referenceTree =
+                    getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
+                export(folder, index, item, referenceTree)
+                println(
+                    "find reference($index, ${item.name}) end " +
+                            "cost time(${System.currentTimeMillis() - findStartTime}) " +
+                            "on thread: $currentThreadName"
+                )
             }
         }
 //        permissionSpecs?.let {
@@ -220,10 +215,10 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         return result.toString()
     }
 
-    private fun getDexType(javaType: String): String = when (javaType) {
+    private fun getDexType(javaType: String?): String = when (javaType) {
         "int", "Int" -> "I"
         "boolean", "Boolean" -> "Z"
-        "void", "Unit" -> "V"
+        null, "void", "Unit" -> "V"
         else -> javaType.replace("\\.", "/")
     }
 
@@ -354,7 +349,12 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         }
     }
 
-    private fun export(folder: File, index: Int, permissionSpec: PermissionSpec, referenceTree: List<List<String>>) {
+    private fun export(
+        folder: File,
+        index: Int,
+        permissionSpec: PermissionSpec,
+        referenceTree: List<List<String>>
+    ) {
         val wb = SXSSFWorkbook(100)
         val stackStyle = wb.createCellStyle()
         stackStyle.alignment = HorizontalAlignment.LEFT
@@ -368,33 +368,131 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             val sheet = wb.createSheet(permissionSpec.name)
             //创建标题
             val titleRow = sheet.createRow(0)
-            val titleCell = titleRow.createCell(0, CellType.STRING)
+            //第一列
+            var titleCell = titleRow.createCell(0, CellType.STRING)
+            titleCell.setCellValue("类型")
+            //第二列
+            titleCell = titleRow.createCell(1, CellType.STRING)
+            titleCell.setCellValue("库名")
+            //第三列
+            titleCell = titleRow.createCell(2, CellType.STRING)
             titleCell.setCellValue("堆栈")
             var rowIndex = sheet.lastRowNum + 1
             //用于设置列的宽度
-            var textMaxWidth = 0
+            var firstWidth = 2
+            var secondWidth = 2
+            var thirdWidth = 2
             for (stack in referenceTree) {
                 var str = ""
+                var lastLine = ""
                 for ((sIndex, line) in stack.withIndex()) {
-                    if (line.length > textMaxWidth) {
-                        textMaxWidth = line.length
+                    if (line.length > thirdWidth) {
+                        thirdWidth = line.length
                     }
                     str += line
                     if (sIndex != stack.size - 1) {
+                        //不是最后一个
                         str += "\n"
+                    } else {
+                        //最后一个
+                        lastLine = line
                     }
                 }
                 val itemRow = sheet.createRow(rowIndex++)
-                val stackCell = itemRow.createCell(0, CellType.STRING)
-                stackCell.cellStyle = stackStyle
-                stackCell.setCellValue(str)
+                val (first, second) = getTypeAndLibraryName(lastLine)
+                //第一列
+                val firstCell = itemRow.createCell(0, CellType.STRING)
+                firstCell.setCellValue(first)
+                if (first.length > firstWidth) {
+                    firstWidth = first.length
+                }
+                //第二列
+                val secondCell = itemRow.createCell(1, CellType.STRING)
+                secondCell.setCellValue(second)
+                if (second.length > secondWidth) {
+                    secondWidth = second.length
+                }
+                //第三列
+                val thirdCell = itemRow.createCell(2, CellType.STRING)
+                thirdCell.cellStyle = stackStyle
+                thirdCell.setCellValue(str)
             }
             //一个字符宽度是256, 支持的最大字符个数: 255
-            val columnWidth = textMaxWidth.coerceAtMost(255) * 256
             //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
-            sheet.setColumnWidth(0, columnWidth)
+            //第一列
+            sheet.setColumnWidth(0, firstWidth * 256)
+            //第二列
+            sheet.setColumnWidth(1, secondWidth * 256)
+            thirdWidth = thirdWidth.coerceAtMost(255) * 256
+            sheet.setColumnWidth(2, thirdWidth)
             wb.write(stream)
         }
         wb.dispose()
+    }
+
+    private fun getTypeAndLibraryName(line: String): Pair<String, String> {
+        if (line.startsWith("androidx.fragment.app")) {
+            return Pair("Android", LIBRARY_ANDROID_FRAGMENT)
+        }
+        if (line.startsWith("com.alibaba.sdk.android.push")) {
+            return Pair("阿里巴巴", LIBRARY_ALIBABA_PUSH)
+        }
+        if (line.startsWith("pub.devrel.easypermissions")) {
+            return Pair("三方", LIBRARY_EASY_PERMISSION)
+        }
+        if (line.startsWith("com.sensorsdata.analytics.android.sdk")) {
+            return Pair("神策", LIBRARY_SENSORS)
+        }
+        if (line.startsWith("com.sina")
+            || line.startsWith("com.weibo.ssosdk")
+        ) {
+            return Pair("新浪", LIBRARY_SINA)
+        }
+        if (line.startsWith("androidx.core")) {
+            return Pair("Android", LIBRARY_ANDROID_CORE)
+        }
+        if (line.startsWith("com.alipay")) {
+            return Pair("阿里巴巴", LIBRARY_ALIBABA_PAY)
+        }
+        if (line.startsWith("com.tencent.bugly")) {
+            return Pair("腾讯", LIBRARY_TENCENT_BUGLY)
+        }
+        if (line.startsWith("com.tencent.connect")
+            || line.startsWith("com.tencent.open")
+            || line.startsWith("com.tencent.tauth")
+        ) {
+            return Pair("腾讯", LIBRARY_TENCENT_QQ)
+        }
+        if (line.startsWith("com.xiaomi.push")) {
+            return Pair("小米", LIBRARY_XIAOMI_PUSH)
+        }
+        if (line.startsWith("com.tencent.mm.opensdk")) {
+            return Pair("微信", LIBRARY_WX)
+        }
+        if (line.startsWith("com.hundsun")) {
+            return Pair("恒生", LIBRARY_HUNDSUN)
+        }
+        val index = line.indexOf(" ")
+        var clsName = line
+        if (index != -1) {
+            clsName = line.substring(0, index)
+        }
+        return Pair("-", clsName)
+    }
+
+    companion object {
+        const val LIBRARY_ANDROID_FRAGMENT = "androidx.fragment:fragment"
+        const val LIBRARY_ANDROID_CORE = "androidx.core:core"
+        const val LIBRARY_ALIBABA_PUSH = "com.aliyun.ams:alicloud-android-push"
+        const val LIBRARY_EASY_PERMISSION = "pub.devrel:easypermissions"
+        const val LIBRARY_SENSORS = "com.sensorsdata.analytics.android:SensorsAnalyticsSDK"
+        const val LIBRARY_SINA = "com.sina:weibo-core"
+        const val LIBRARY_ALIBABA_PAY = "com.alipay"
+        const val LIBRARY_TENCENT_BUGLY = "com.tencent.bugly:crashreport"
+        const val LIBRARY_XIAOMI_PUSH = "com.xiaomi:push"
+        const val LIBRARY_TENCENT_QQ = "com.tencent:qq"
+        const val LIBRARY_WX = "com.tencent.mm.opensdk:wechat-sdk-android"
+        const val LIBRARY_HUNDSUN = "com.hundsun"
+
     }
 }

@@ -7,6 +7,13 @@
 3. 使用POI生成Excel
 4. 每个隐私权限涉及的代码调用堆栈存放在一个Excel中
 
+## 使用
+
+1. 插件id: io.github.jingtuo.privacy-permission
+
+
+## 工具
+
 ### apkanalyzer
 
 ```shell

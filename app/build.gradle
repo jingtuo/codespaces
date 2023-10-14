@@ -7,7 +7,7 @@ apply plugin: "io.github.jingtuo.privacy-permission"
 
 privacyPermission {
     cmdlineToolsDir = file("C:/Software/Android/Sdk/cmdline-tools/latest")
-    apkFilePath = "D:\\apk\\ghjth\\7.9.0\\test\\HengShengAPP-7.9.0.0-TEST-202309272043.apk"
+    apkFilePath = "D:\\apk\\ghjth\\7.9.0\\test\\Test.apk"
     mappingFilePath = ""
     permissionSpecsFile = file("D:\\Projects\\github\\jingtuo\\Codespaces\\privacy-permission\\permissionSpecs.json")
     outputDir = file("D:\\apk\\ghjth\\7.9.0\\test2")
@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.core:core-ktx:+'

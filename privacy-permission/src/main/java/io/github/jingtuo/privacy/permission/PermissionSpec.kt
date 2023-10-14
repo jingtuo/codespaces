@@ -17,13 +17,13 @@ class PermissionSpec {
     var fieldType: String = ""
     var methodName: String = ""
     var paramTypes: Array<String>? = null
-    var methodReturnType: String = ""
+    var methodReturnType: String? = null
 
     fun getReferencesTo(): String {
         if (isField) {
             return "$clsName $fieldType $fieldName"
         }
-        var result = "$clsName $methodReturnType $methodName("
+        var result = "$clsName ${methodReturnType?:"void"} $methodName("
         paramTypes?.let {
             for ((index, paramType) in it.withIndex()) {
                 result += paramType

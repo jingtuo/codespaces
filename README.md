@@ -52,6 +52,12 @@
 1. 使用KeyGenerator.getInstance(algorithm, provider)生成SM4的密钥KEY, 遇到错误: java.security.InvalidAlgorithmParameterException: Not Implemented  
    暂时未明白: JceSecurity.getInstance("KeyGenerator", KeyGeneratorSpi.class, algorithm, provider)找到的是BaseKeyGenerator
 
+
+## 隐私权限
+
+基于apkanalyzer检索apk中引用树的功能, 查找涉及隐私权限的代码调用堆栈, 详见[这里](privacy-permission/README.md)
+
+
 ## 参考文献
 
 - [Android Kotlin Start](https://developer.android.google.cn/kotlin/get-started)

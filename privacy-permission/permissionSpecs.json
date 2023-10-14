@@ -70,14 +70,7 @@
     "methodReturnType": "java.io.File"
   },
   {
-    "name": "设备信息",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getDeviceId",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息",
+    "name": "设备信息-DeviceId",
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getDeviceId",
@@ -85,14 +78,7 @@
     "methodReturnType": "java.lang.String"
   },
   {
-    "name": "设备信息",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getImei",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息",
+    "name": "设备信息-IMEI",
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getImei",
@@ -100,32 +86,54 @@
     "methodReturnType": "java.lang.String"
   },
   {
-    "name": "设备信息",
+    "name": "设备信息-手机号码",
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getLine1Number",
     "methodReturnType": "java.lang.String"
   },
   {
-    "name": "设备信息",
+    "name": "设备信息-MEID",
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getMeid",
     "methodReturnType": "java.lang.String"
   },
   {
-    "name": "设备信息",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getMeid",
-    "paramTypes": ["int"],
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息",
+    "name": "设备信息-ANDROID_ID",
     "clsName": "android.provider.Settings$Secure",
     "isField": true,
     "fieldName": "ANDROID_ID",
     "fieldType": "java.lang.String"
+  },
+  {
+    "name": "请求权限",
+    "clsName": "android.app.Activity",
+    "isField": false,
+    "methodName": "requestPermissions",
+    "paramTypes": ["java.lang.String[]", "int"]
+  },
+  {
+    "name": "请求权限",
+    "clsName": "androidx.activity.ComponentActivity",
+    "isField": false,
+    "methodName": "registerForActivityResult",
+    "paramTypes": ["androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions",
+      "androidx.activity.result.ActivityResultCallback"]
+  },
+  {
+    "name": "请求权限(deprecated)",
+    "clsName": "androidx.fragment.app.Fragment",
+    "isField": false,
+    "methodName": "requestPermissions",
+    "paramTypes": ["java.lang.String[]", "int"]
+  },
+  {
+    "name": "请求权限",
+    "clsName": "androidx.fragment.app.Fragment",
+    "isField": false,
+    "methodName": "registerForActivityResult",
+    "paramTypes": ["androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions",
+      "androidx.activity.result.ActivityResultCallback"]
   }
 ]
