@@ -23,8 +23,8 @@ abstract class PrivacyPermissionExtension {
     /**
      * Apk文件, 注: 不是加固的apk
      */
-    @Input
-    abstract fun getApkFilePath(): Property<String>
+    @InputFile
+    abstract fun getApkFile(): RegularFileProperty
 
     /**
      * mapping文件

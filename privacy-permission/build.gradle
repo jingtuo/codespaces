@@ -8,12 +8,17 @@ plugins {
     // The latest version of the Plugin Publishing Plugin can be found on the Gradle Plugin Portal.
     // https://plugins.gradle.org/m2/com/gradle/publish/plugin-publish-plugin/
     id 'com.gradle.plugin-publish' version '1.2.1'
-    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 
@@ -29,16 +34,16 @@ def gitHttpUrl = "https://github.com/jingtuo/codespaces.git"
 //分组
 def curArtifactId = "privacy-permission"
 group = "io.github.jingtuo"
-version = '0.0.1'
+version = '0.0.2'
 def pluginId = "io.github.jingtuo.$curArtifactId"
 
-pluginBundle {
-    // Set the website for your plugin’s project.
-    website = siteUrl
-    // Provide the source repository URI so that others can find it if they want to contribute.
-    vcsUrl = gitHttpUrl
-    tags = ['Android', 'Permission']
-}
+//pluginBundle {
+//    // Set the website for your plugin’s project.
+//    website = siteUrl
+//    // Provide the source repository URI so that others can find it if they want to contribute.
+//    vcsUrl = gitHttpUrl
+//    tags = ['Android', 'Permission']
+//}
 
 gradlePlugin {
     plugins {
@@ -53,11 +58,11 @@ gradlePlugin {
 
 dependencies {
 //    implementation group: 'org.ow2.asm', name: 'asm-analysis', version: '9.5'
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
 //    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     implementation 'org.apache.poi:poi:5.2.4'
     implementation 'org.apache.poi:poi-ooxml:5.2.4'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 // 发布到本地

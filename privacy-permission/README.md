@@ -3,139 +3,74 @@
 ## 设计思路
 
 1. 整理隐私权限涉及的代码(类名及其属性名或方法名)
-2. 基于apkanalyzer收集方法堆栈, 检测是否存在"隐私权限涉及的代码"
+2. 基于[ApkAnalyzer](ApkAnalyzer.md)收集方法堆栈, 检测是否存在"隐私权限涉及的代码"
 3. 使用POI生成Excel
 4. 每个隐私权限涉及的代码调用堆栈存放在一个Excel中
 
 ## 使用
 
-1. 插件id: io.github.jingtuo.privacy-permission
+### 应用插件
 
-
-## 工具
-
-### apkanalyzer
-
-```shell
-Subject must be one of: apk, files, manifest, dex, resources
-
-apk summary              Prints the application Id, version code and version name.
-apk file-size            Prints the file size of the APK.
-apk download-size        Prints an estimate of the download size of the APK.
-apk features             Prints features used by the APK.
-apk compare              Compares the sizes of two APKs.
-files list               Lists all files in the zip.
-files cat                Prints the given file contents to stdout
-manifest print           Prints the manifest in XML format
-manifest application-id  Prints the application id.
-manifest version-name    Prints the version name.
-manifest version-code    Prints the version code.
-manifest min-sdk         Prints the minimum sdk.
-manifest target-sdk      Prints the target sdk
-manifest permissions     Prints a list of used permissions
-manifest debuggable      Prints if the app is debuggable
-dex list                 Prints a list of dex files in the APK
-dex references           Prints number of references in dex files
-dex packages             Prints the class tree from DEX.
-P,C,M,F: indicates
-                           packages, classes methods, fields
-x,k,r,d: indicates
-                           removed, kept, referenced and defined nodes
-dex code                 Prints the bytecode of a class or method in smali format
-dex reference-tree       Prints a reference tree to a given or a list of
-                           classes/methods/fields.
-resources packages       Prints a list of packages in resources table
-resources configs        Prints a list of configurations for a type
-resources value          Prints value of the given resource
-resources names          Prints a list of resource names for a type
-resources xml            Prints the human readable form of a binary XML
-
-Usage:
-apkanalyzer [global options] <subject> <verb> [options] <apk> [<apk2>]
-
-Option            Description
-------            -----------
---human-readable  Print sizes in human readable format
+Using the plugins DSL:
+```groovy
+plugins {
+    id "io.github.jingtuo.privacy-permission" version "0.0.1"
+}
 ```
 
-#### dex
-
-```shell
-Verb must be one of: list, references, packages, code, reference-tree
-
-==============================
-dex list:
-Prints a list of dex files in the APK
-
-No options specified
-
-==============================
-dex references:
-Prints number of references in dex files
-
-Option   Description
-------   -----------
---files  Dex file names to include. Default: all dex files.
-
-==============================
-dex packages:
-Prints the class tree from DEX.
-P,C,M,F: indicates packages, classes methods, fields
-x,k,r,d: indicates removed, kept, referenced and defined nodes
-
-Option                      Description
-------                      -----------
---defined-only              Only include classes defined in the APK in the output.
---files                     Dex file names to include. Default: all dex files.
---proguard-folder <File>    The Proguard output folder to search for mappings.
---proguard-mappings <File>  The Proguard mappings file.
---proguard-seeds <File>     The Proguard seeds file.
---proguard-usages <File>    The Proguard usages file.
---show-removed              Show classes and members that were removed by Proguard.
-
-==============================
-dex code:
-Prints the bytecode of a class or method in smali format
-
-Option (* = required)       Description
----------------------       -----------
-* --class                   Fully qualified class name to decompile.
---method                    Method to decompile. Format: name(params)returnType, e.g.
-                              someMethod(Ljava/lang/String;I)V
---proguard-folder <File>    The Proguard output folder to search for mappings.
---proguard-mappings <File>  The Proguard mappings file.
-
-==============================
-dex reference-tree:
-Prints a reference tree to a given or a list of classes/methods/fields.
-
-Option                      Description
-------                      -----------
---files                     Dex file names to include. Default: all dex files.
---input-file <File>         The file with a class, method or field to query in each
-                              line.
---proguard-folder <File>    The Proguard output folder to search for mappings.
---proguard-mappings <File>  The Proguard mappings file.
---proguard-seeds <File>     The Proguard seeds file.
---proguard-usages <File>    The Proguard usages file.
---references-to             Class/constructor/method/field descriptor. Format:
-                              Class: class_name.
-  Constructor: class_name
-                              constructor_name
-  Method: class_name return_type
-                              method_name
-  Field: class_name field_type filed_name
-                              The descriptor can be copied from the output of
- .
-                              /apkanalyzer dex packages
-
-Usage:
-apkanalyzer [global options] <subject> <verb> [options] <apk> [<apk2>]
-
-Option            Description
-------            -----------
---human-readable  Print sizes in human readable format
+Using legacy plugin application:
+```groovy
+buildscript {
+  repositories {
+    maven {
+      url = "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "io.github.jingtuo:privacy-permission:0.0.1"
+  }
+}
 ```
+
+### 配置
+
+#### privacyPermission
+
+```groovy
+privacyPermission {
+    //指定的目录必须存在
+    cmdlineToolsDir = file("C:/Android/Sdk/cmdline-tools/latest")
+    //指定的文件必须存在, 非加固包
+    apkFile = file("D:/apk/test/test.apk")
+    mappingFilePath = ""
+    permissionSpecsFile = file("D:\\Projects\\github\\jingtuo\\Codespaces\\privacy-permission\\permissionSpecs.json")
+    outputDir = file("D:\\apk\\test2")
+}
+```
+
+#### permissionSpecsFile
+
+```json
+[
+  {
+    "name": "应用进程",
+    "clsName": "android.app.ActivityManager",
+    "isField": false,
+    "methodName": "getRunningAppProcesses",
+    "methodReturnType": "java.util.List"
+  }
+]
+```
+
+## 版本
+
+### 0.0.2
+
+1. 移除对Kotlin序列化插件的依赖, 使用Gson解析permissionSpecsFile文件
+
+### 0.0.1
+
+1. 基于Apk Analyzer收集隐私权限相关类的调用堆栈
 
 ## 参考资料
 

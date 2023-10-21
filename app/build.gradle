@@ -6,11 +6,13 @@ plugins {
 apply plugin: "io.github.jingtuo.privacy-permission"
 
 privacyPermission {
-    cmdlineToolsDir = file("C:/Software/Android/Sdk/cmdline-tools/latest")
-    apkFilePath = "D:\\apk\\ghjth\\7.9.0\\test\\Test.apk"
+    //指定的目录必须存在
+    cmdlineToolsDir = file("C:/Android/Sdk/cmdline-tools/latest")
+    //指定的文件必须存在, 非加固包
+    apkFile = file("D:/apk/test/test.apk")
     mappingFilePath = ""
     permissionSpecsFile = file("D:\\Projects\\github\\jingtuo\\Codespaces\\privacy-permission\\permissionSpecs.json")
-    outputDir = file("D:\\apk\\ghjth\\7.9.0\\test2")
+    outputDir = file("D:\\apk\\test2")
 }
 
 android {
@@ -45,7 +47,7 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.core:core-ktx:+'
+    implementation 'androidx.core:core-ktx:1.9.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

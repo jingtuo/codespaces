@@ -1,6 +1,5 @@
 package io.github.jingtuo.privacy.permission
 
-import kotlinx.serialization.Serializable
 
 /**
  * 权限信息
@@ -8,7 +7,6 @@ import kotlinx.serialization.Serializable
  * clsName: 类名
  * propertyName: 属性名或方法名
  */
-@Serializable
 class PermissionSpec {
     var name: String = ""
     var clsName: String = ""

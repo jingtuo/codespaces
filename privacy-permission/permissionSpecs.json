@@ -74,7 +74,21 @@
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getDeviceId",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-DeviceId",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getDeviceId",
     "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-IMEI",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getImei",
     "methodReturnType": "java.lang.String"
   },
   {
@@ -97,6 +111,14 @@
     "clsName": "android.telephony.TelephonyManager",
     "isField": false,
     "methodName": "getMeid",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-MEID",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getMeid",
+    "paramTypes": ["int"],
     "methodReturnType": "java.lang.String"
   },
   {
@@ -161,5 +183,33 @@
     "paramTypes": ["java.lang.String",
       "java.util.concurrent.Executor",
       "android.hardware.camera2.CameraDevice$StateCallback"]
+  },
+  {
+    "name": "构建信息-Serial(deprecated)",
+    "clsName": "android.os.Build",
+    "isField": true,
+    "fieldName": "SERIAL",
+    "fieldType": "java.lang.String"
+  },
+  {
+    "name": "构建信息-Serial",
+    "clsName": "android.os.Build",
+    "isField": false,
+    "methodName": "getSerial",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-SimSerialNumber",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getSimSerialNumber",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-SubscriberId",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getSubscriberId",
+    "methodReturnType": "java.lang.String"
   }
 ]

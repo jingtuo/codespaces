@@ -1,8 +1,7 @@
 package io.github.jingtuo.privacy.permission
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.VerticalAlignment
@@ -18,8 +17,8 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.FileReader
 import java.io.InputStreamReader
 import java.lang.StringBuilder
 
@@ -37,8 +36,8 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
     /**
      * apk文件
      */
-    @Input
-    abstract fun getApkFilePath(): Property<String>
+    @InputFile
+    abstract fun getApkFile(): RegularFileProperty
 
     /**
      * mapping文件
@@ -55,16 +54,15 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
     @OutputDirectory
     abstract fun getOutputDir(): DirectoryProperty
 
-    @OptIn(ExperimentalSerializationApi::class)
     @TaskAction
     fun execute() {
         val currentThreadName = Thread.currentThread().name
         //默认线程: Execution worker Thread 7
-        println("check privacy permission start on main thread : $currentThreadName")
         val startTime = System.currentTimeMillis()
         val cmdlineToolsHome = getCmdlineToolsDir().get().asFile.path
         //Windows 11
         val osName = System.getProperty("os.name")
+        println("check privacy permission start on os($osName) + main thread($currentThreadName)")
         val isWindow = osName.contains("Windows", true);
         val commandName = if (isWindow) {
             "apkanalyzer.bat"
@@ -95,12 +93,14 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         } else {
             "${cmdlineToolsHome}${File.separator}bin${File.separator}$commandName"
         }
-        //将错误输出流合并到标准输出流
-        val apkFilePath = getApkFilePath().get()
+        val apkFilePath = getApkFile().get().asFile.absolutePath
+        println("command: $command, apk path: $apkFilePath")
         val mappingFilePath = getMappingFilePath().get()
         var permissionSpecs: List<PermissionSpec>?
-        FileInputStream(getPermissionSpecsFile().get().asFile).use {
-            permissionSpecs = Json.decodeFromStream(it)
+        val gson = Gson()
+        gson.newJsonReader(FileReader(getPermissionSpecsFile().get().asFile)).use {
+            permissionSpecs = gson.fromJson(it, object : TypeToken<List<PermissionSpec>>() {
+            }.type)
         }
         permissionSpecs?.map {
             var matchContent = "L${it.clsName.replace("\\.", "/")};->"
@@ -120,7 +120,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                 //考虑自己机器的内存不足, 此处限定4个线程并发
                 val findStartTime = System.currentTimeMillis()
                 val referencesTo = item.getReferencesTo()
-                println("find reference($index, ${item.name}) start on thread: $currentThreadName")
+                println("find reference($index, ${item.name}, $referencesTo) start on thread: $currentThreadName")
                 val referenceTree =
                     getReferenceTree(command, apkFilePath, mappingFilePath, referencesTo)
                 export(folder, index, item, referenceTree)
@@ -173,10 +173,19 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         apkFilePath: String,
         mappingFilePath: String
     ): List<String> {
-        val process = ProcessBuilder(
-            command, "dex", "packages", "--defined-only",
-            "--proguard-mappings", mappingFilePath, apkFilePath
-        )
+        val builder = if (mappingFilePath.isNullOrEmpty()) {
+            ProcessBuilder(
+                command, "dex", "packages", "--defined-only",
+                apkFilePath
+            )
+        } else {
+            ProcessBuilder(
+                command, "dex", "packages", "--defined-only",
+                "--proguard-mappings", mappingFilePath,
+                apkFilePath
+            )
+        }
+        val process = builder
             .inheritIO()
             .redirectErrorStream(true)
             .start()
@@ -197,10 +206,19 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         mappingFilePath: String,
         clsName: String
     ): String {
-        val process = ProcessBuilder(
-            command, "dex", "code", "--class", clsName,
-            "--proguard-mappings", mappingFilePath, apkFilePath
-        )
+        val builder = if (mappingFilePath.isNullOrEmpty()) {
+            ProcessBuilder(
+                command, "dex", "code", "--class", clsName,
+                apkFilePath
+            )
+        } else {
+            ProcessBuilder(
+                command, "dex", "code", "--class", clsName,
+                "--proguard-mappings", mappingFilePath,
+                apkFilePath
+            )
+        }
+        val process = builder
             .inheritIO()
             .redirectErrorStream(true)
             .start()
@@ -238,10 +256,19 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         command: String, apkFilePath: String, mappingFilePath: String,
         referencesTo: String
     ): List<List<String>> {
-        val process = ProcessBuilder(
-            command, "dex", "reference-tree", "--references-to", referencesTo,
-            "--proguard-mappings", mappingFilePath, apkFilePath
-        )
+        val builder = if (mappingFilePath.isNullOrEmpty()) {
+            ProcessBuilder(
+                command, "dex", "reference-tree", "--references-to", referencesTo,
+                apkFilePath
+            )
+        } else {
+            ProcessBuilder(
+                command, "dex", "reference-tree", "--references-to", referencesTo,
+                "--proguard-mappings", mappingFilePath,
+                apkFilePath
+            )
+        }
+        val process = builder
             .inheritIO()
             .start()
         val result = mutableListOf<List<String>>()
@@ -250,6 +277,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         BufferedReader(InputStreamReader(process.inputStream)).use {
             while (true) {
                 val line = it.readLine()
+                println("-->$line")
                 if (line == null) {
                     result.add(curStack)
                     break
@@ -286,75 +314,15 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         return result
     }
 
-    /**
-     * 导出数据
-     */
-    private fun export(
-        permissionSpecs: List<PermissionSpec>,
-        map: Map<String, List<List<String>>>
-    ) {
-        val folder = getOutputDir().get().asFile
-        if (!folder.exists()) {
-            folder.mkdirs()
-        }
-        for ((pIndex, permission) in permissionSpecs.withIndex()) {
-            //由于将所有权限写在一个文件中, 会出现Java内存不足, 所以将每个权限写一个文件
-            //由于csv无法满足单元格内换行, 引入poi
-            val wb = SXSSFWorkbook(100)
-            val stackStyle = wb.createCellStyle()
-            stackStyle.alignment = HorizontalAlignment.LEFT
-            stackStyle.verticalAlignment = VerticalAlignment.CENTER
-            stackStyle.wrapText = true
-            stackStyle.shrinkToFit = false
-            FileOutputStream(
-                File(folder, permission.name + "-$pIndex.xlsx")
-            ).use { stream ->
-                //创建Sheet
-                val sheet = wb.createSheet(permission.name)
-                //创建标题
-                val titleRow = sheet.createRow(0)
-                val titleCell = titleRow.createCell(0, CellType.STRING)
-                titleCell.setCellValue("堆栈")
-                val referencesTo = permission.getReferencesTo()
-                val list = map[referencesTo]
-                var rowIndex = sheet.lastRowNum + 1
-                //用于设置列的宽度
-                var textMaxWidth = 0
-                list?.let {
-                    for (stack in it) {
-                        var str = ""
-                        for ((sIndex, line) in stack.withIndex()) {
-                            if (line.length > textMaxWidth) {
-                                textMaxWidth = line.length
-                            }
-                            str += line
-                            if (sIndex != stack.size - 1) {
-                                str += "\n"
-                            }
-                        }
-                        val itemRow = sheet.createRow(rowIndex++)
-//                            itemRow.height = (stack.size * 20).toShort()
-                        val stackCell = itemRow.createCell(0, CellType.STRING)
-                        stackCell.cellStyle = stackStyle
-                        stackCell.setCellValue(str)
-                    }
-                }
-                //一个字符宽度是256, 支持的最大字符个数: 255
-                var columnWidth = textMaxWidth.coerceAtMost(255) * 256
-                //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
-                sheet.setColumnWidth(0, columnWidth)
-                wb.write(stream)
-            }
-            wb.dispose()
-        }
-    }
-
     private fun export(
         folder: File,
         index: Int,
         permissionSpec: PermissionSpec,
         referenceTree: List<List<String>>
     ) {
+        if (referenceTree.isNullOrEmpty()) {
+            return
+        }
         val wb = SXSSFWorkbook(100)
         val stackStyle = wb.createCellStyle()
         stackStyle.alignment = HorizontalAlignment.LEFT
@@ -397,6 +365,9 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                         //最后一个
                         lastLine = line
                     }
+                }
+                if (str.isNullOrEmpty()) {
+                    continue
                 }
                 val itemRow = sheet.createRow(rowIndex++)
                 val (first, second) = getTypeAndLibraryName(lastLine)
