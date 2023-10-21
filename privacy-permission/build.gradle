@@ -37,21 +37,18 @@ group = "io.github.jingtuo"
 version = '0.0.2'
 def pluginId = "io.github.jingtuo.$curArtifactId"
 
-//pluginBundle {
-//    // Set the website for your plugin’s project.
-//    website = siteUrl
-//    // Provide the source repository URI so that others can find it if they want to contribute.
-//    vcsUrl = gitHttpUrl
-//    tags = ['Android', 'Permission']
-//}
-
 gradlePlugin {
+    // Set the website for your plugin’s project.
+    website = siteUrl
+    // Provide the source repository URI so that others can find it if they want to contribute.
+    vcsUrl = gitHttpUrl
     plugins {
         privacyPermission {
             id = pluginId
             implementationClass = "io.github.jingtuo.privacy.permission.PrivacyPermissionPlugin"
             displayName = pluginName
             description = pluginDescription
+            tags.addAll('Android', 'Permission', "CallStack")
         }
     }
 }
