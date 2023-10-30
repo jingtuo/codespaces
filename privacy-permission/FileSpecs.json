@@ -1,0 +1,10 @@
+[
+  {
+    "name": "文件操作-map",
+    "clsName": "java.nio.channels.FileChannel",
+    "isField": false,
+    "methodName": "map",
+    "paramTypes": ["java.nio.channels.FileChannel$MapMode", "long", "long"],
+    "methodReturnType": "java.nio.MappedByteBuffer"
+  }
+]

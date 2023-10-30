@@ -23,105 +23,6 @@
     "methodReturnType": "java.util.List"
   },
   {
-    "name": "应用包信息",
-    "clsName": "android.content.pm.PackageManager",
-    "isField": false,
-    "methodName": "getPackageInfo",
-    "paramTypes": ["java.lang.String", "int"],
-    "methodReturnType": "android.content.pm.PackageInfo"
-  },
-  {
-    "name": "应用包信息",
-    "clsName": "android.content.pm.PackageManager",
-    "isField": false,
-    "methodName": "getPackageInfo",
-    "paramTypes": ["java.lang.String", "android.content.pm.PackageManager$PackageInfoFlags"],
-    "methodReturnType": "android.content.pm.PackageInfo"
-  },
-  {
-    "name": "应用包信息",
-    "clsName": "android.content.pm.PackageManager",
-    "isField": false,
-    "methodName": "getPackageInfo",
-    "paramTypes": ["android.content.pm.VersionedPackage", "android.content.pm.PackageManager$PackageInfoFlags"],
-    "methodReturnType": "android.content.pm.PackageInfo"
-  },
-  {
-    "name": "应用包信息",
-    "clsName": "android.content.pm.PackageManager",
-    "isField": false,
-    "methodName": "getPackageInfo",
-    "paramTypes": ["android.content.pm.VersionedPackage", "int"],
-    "methodReturnType": "android.content.pm.PackageInfo"
-  },
-  {
-    "name": "外部存储信息",
-    "clsName": "android.os.Environment",
-    "isField": false,
-    "methodName": "getExternalStorageDirectory",
-    "methodReturnType": "java.io.File"
-  },
-  {
-    "name": "外部存储信息",
-    "clsName": "android.os.Environment",
-    "isField": false,
-    "methodName": "getExternalStoragePublicDirectory",
-    "paramTypes": ["java.lang.String"],
-    "methodReturnType": "java.io.File"
-  },
-  {
-    "name": "设备信息-DeviceId",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getDeviceId",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-DeviceId",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getDeviceId",
-    "paramTypes": ["int"],
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-IMEI",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getImei",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-IMEI",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getImei",
-    "paramTypes": ["int"],
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-手机号码",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getLine1Number",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-MEID",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getMeid",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-MEID",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getMeid",
-    "paramTypes": ["int"],
-    "methodReturnType": "java.lang.String"
-  },
-  {
     "name": "设备信息-ANDROID_ID",
     "clsName": "android.provider.Settings$Secure",
     "isField": true,
@@ -159,43 +60,10 @@
       "androidx.activity.result.ActivityResultCallback"]
   },
   {
-    "name": "使用相机(deprecated)",
-    "clsName": "android.hardware.Camera",
-    "isField": false,
-    "methodName": "open",
-    "paramTypes": ["int"],
-    "methodReturnType": "android.hardware.Camera"
-  },
-  {
-    "name": "使用相机",
-    "clsName": "android.hardware.camera2.CameraManager",
-    "isField": false,
-    "methodName": "openCamera",
-    "paramTypes": ["java.lang.String",
-      "android.hardware.camera2.CameraDevice$StateCallback",
-      "android.os.Handler"]
-  },
-  {
-    "name": "使用相机",
-    "clsName": "android.hardware.camera2.CameraManager",
-    "isField": false,
-    "methodName": "openCamera",
-    "paramTypes": ["java.lang.String",
-      "java.util.concurrent.Executor",
-      "android.hardware.camera2.CameraDevice$StateCallback"]
-  },
-  {
-    "name": "构建信息-Serial(deprecated)",
-    "clsName": "android.os.Build",
+    "name": "权限-USE_FULL_SCREEN_INTENT",
+    "clsName": "android.Manifest.permission",
     "isField": true,
-    "fieldName": "SERIAL",
+    "fieldName": "USE_FULL_SCREEN_INTENT",
     "fieldType": "java.lang.String"
-  },
-  {
-    "name": "构建信息-Serial",
-    "clsName": "android.os.Build",
-    "isField": false,
-    "methodName": "getSerial",
-    "methodReturnType": "java.lang.String"
   }
 ]

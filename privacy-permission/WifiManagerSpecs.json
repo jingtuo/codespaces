@@ -1,27 +1,27 @@
 [
   {
-    "name": "WIFI信息-扫描(API 28 deprecated)",
+    "name": "WIFI-扫描(API 28 deprecated)",
     "clsName": "android.net.wifi.WifiManager",
     "isField": false,
     "methodName": "startScan",
     "methodReturnType": "boolean"
   },
   {
-    "name": "WIFI信息-扫描结果",
+    "name": "WIFI-扫描结果",
     "clsName": "android.net.wifi.WifiManager",
     "isField": false,
     "methodName": "getScanResults",
     "methodReturnType": "java.util.List"
   },
   {
-    "name": "WIFI信息-连接信息(API 31 deprecated)",
+    "name": "WIFI-连接信息(API 31 deprecated)",
     "clsName": "android.net.wifi.WifiManager",
     "isField": false,
     "methodName": "getConnectionInfo",
     "methodReturnType": "android.net.wifi.WifiInfo"
   },
   {
-    "name": "WIFI信息-可配置的网络(API 29 deprecated)",
+    "name": "WIFI-可配置的网络(API 29 deprecated)",
     "clsName": "android.net.wifi.WifiManager",
     "isField": false,
     "methodName": "getConfiguredNetworks",

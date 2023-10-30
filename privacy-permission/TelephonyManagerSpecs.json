@@ -1,4 +1,55 @@
-[
+[{
+  "name": "设备信息-DeviceId",
+  "clsName": "android.telephony.TelephonyManager",
+  "isField": false,
+  "methodName": "getDeviceId",
+  "methodReturnType": "java.lang.String"
+},
+  {
+    "name": "设备信息-DeviceId",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getDeviceId",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-IMEI",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getImei",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-IMEI",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getImei",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-手机号码",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getLine1Number",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-MEID",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getMeid",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-MEID",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getMeid",
+    "paramTypes": ["int"],
+    "methodReturnType": "java.lang.String"
+  },
   {
     "name": "设备信息-SimSerialNumber",
     "clsName": "android.telephony.TelephonyManager",

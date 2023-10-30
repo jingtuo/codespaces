@@ -1,0 +1,28 @@
+[
+  {
+    "name": "使用相机(deprecated)",
+    "clsName": "android.hardware.Camera",
+    "isField": false,
+    "methodName": "open",
+    "paramTypes": ["int"],
+    "methodReturnType": "android.hardware.Camera"
+  },
+  {
+    "name": "使用相机",
+    "clsName": "android.hardware.camera2.CameraManager",
+    "isField": false,
+    "methodName": "openCamera",
+    "paramTypes": ["java.lang.String",
+      "android.hardware.camera2.CameraDevice$StateCallback",
+      "android.os.Handler"]
+  },
+  {
+    "name": "使用相机",
+    "clsName": "android.hardware.camera2.CameraManager",
+    "isField": false,
+    "methodName": "openCamera",
+    "paramTypes": ["java.lang.String",
+      "java.util.concurrent.Executor",
+      "android.hardware.camera2.CameraDevice$StateCallback"]
+  }
+]

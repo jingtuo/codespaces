@@ -1,0 +1,17 @@
+[
+  {
+    "name": "外部存储信息",
+    "clsName": "android.os.Environment",
+    "isField": false,
+    "methodName": "getExternalStorageDirectory",
+    "methodReturnType": "java.io.File"
+  },
+  {
+    "name": "外部存储信息",
+    "clsName": "android.os.Environment",
+    "isField": false,
+    "methodName": "getExternalStoragePublicDirectory",
+    "paramTypes": ["java.lang.String"],
+    "methodReturnType": "java.io.File"
+  }
+]

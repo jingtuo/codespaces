@@ -1,0 +1,34 @@
+[
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["java.lang.String", "int"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["java.lang.String", "android.content.pm.PackageManager$PackageInfoFlags"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["android.content.pm.VersionedPackage", "android.content.pm.PackageManager$PackageInfoFlags"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  },
+  {
+    "name": "应用包信息",
+    "clsName": "android.content.pm.PackageManager",
+    "isField": false,
+    "methodName": "getPackageInfo",
+    "paramTypes": ["android.content.pm.VersionedPackage", "int"],
+    "methodReturnType": "android.content.pm.PackageInfo"
+  }
+]
