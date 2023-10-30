@@ -1,0 +1,16 @@
+[
+  {
+    "name": "构建信息-Serial(deprecated)",
+    "clsName": "android.os.Build",
+    "isField": true,
+    "fieldName": "SERIAL",
+    "fieldType": "java.lang.String"
+  },
+  {
+    "name": "构建信息-Serial",
+    "clsName": "android.os.Build",
+    "isField": false,
+    "methodName": "getSerial",
+    "methodReturnType": "java.lang.String"
+  }
+]

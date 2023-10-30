@@ -197,19 +197,5 @@
     "isField": false,
     "methodName": "getSerial",
     "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-SimSerialNumber",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getSimSerialNumber",
-    "methodReturnType": "java.lang.String"
-  },
-  {
-    "name": "设备信息-SubscriberId",
-    "clsName": "android.telephony.TelephonyManager",
-    "isField": false,
-    "methodName": "getSubscriberId",
-    "methodReturnType": "java.lang.String"
   }
 ]

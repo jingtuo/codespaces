@@ -15,7 +15,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "io.github.jingtuo:privacy-permission:0.0.2-SNAPSHOT"
+        classpath "io.github.jingtuo:privacy-permission:0.0.2"
     }
 }
 

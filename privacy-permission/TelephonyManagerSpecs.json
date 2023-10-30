@@ -1,0 +1,74 @@
+[
+  {
+    "name": "设备信息-SimSerialNumber",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getSimSerialNumber",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-SubscriberId",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getSubscriberId",
+    "methodReturnType": "java.lang.String"
+  },
+  {
+    "name": "设备信息-Location(deprecated)",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getCellLocation",
+    "methodReturnType": "android.telephony.CellLocation"
+  },
+  {
+    "name": "设备信息-Location",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getAllCellInfo",
+    "methodReturnType": "java.util.List"
+  },
+  {
+    "name": "设备信息-扫描网络",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "requestNetworkScan",
+    "paramTypes":["android.telephony.NetworkScanRequest", "java.util.concurrent.Executor", "android.telephony.TelephonyScanManager$NetworkScanCallback"],
+    "methodReturnType": "android.telephony.NetworkScan"
+  },
+  {
+    "name": "设备信息-请求网络更新",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "requestCellInfoUpdate",
+    "paramTypes":["java.util.concurrent.Executor", "android.telephony.TelephonyManager$CellInfoCallback"]
+  },
+  {
+    "name": "设备信息-服务状态",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getServiceState",
+    "paramTypes":["int"],
+    "methodReturnType": "android.telephony.ServiceState"
+  },
+  {
+    "name": "设备信息-服务状态",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "getServiceState",
+    "methodReturnType": "android.telephony.ServiceState"
+  },
+  {
+    "name": "设备信息-监听手机状态(deprecated)",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "listen",
+    "paramTypes": ["android.telephony.PhoneStateListener", "int"]
+  },
+  {
+    "name": "设备信息-监听手机状态",
+    "clsName": "android.telephony.TelephonyManager",
+    "isField": false,
+    "methodName": "registerTelephonyCallback",
+    "paramTypes": ["java.util.concurrent.Executor", "android.telephony.TelephonyCallback"]
+  }
+]

@@ -131,9 +131,6 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                 )
             }
         }
-//        permissionSpecs?.let {
-//            export(it, map)
-//        }
         println("check privacy permission end cost ${System.currentTimeMillis() - startTime} on thread : $currentThreadName")
     }
 
@@ -277,7 +274,6 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         BufferedReader(InputStreamReader(process.inputStream)).use {
             while (true) {
                 val line = it.readLine()
-                println("-->$line")
                 if (line == null) {
                     result.add(curStack)
                     break
@@ -391,10 +387,10 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             //一个字符宽度是256, 支持的最大字符个数: 255
             //此处不使用autoSizeColumn, 当数据量过大时, 耗时明显增长很多
             //第一列
-            sheet.setColumnWidth(0, firstWidth * 256)
+            sheet.setColumnWidth(0, firstWidth.coerceAtLeast(4) * 256)
             //第二列
-            sheet.setColumnWidth(1, secondWidth * 256)
-            thirdWidth = thirdWidth.coerceAtMost(255) * 256
+            sheet.setColumnWidth(1, secondWidth.coerceAtLeast(4) * 256)
+            thirdWidth = thirdWidth.coerceAtMost(100) * 256
             sheet.setColumnWidth(2, thirdWidth)
             wb.write(stream)
         }
@@ -443,6 +439,13 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         if (line.startsWith("com.hundsun")) {
             return Pair("恒生", LIBRARY_HUNDSUN)
         }
+        if (line.startsWith("anet.channel")
+            || line.startsWith("anetwork.channel")) {
+            return Pair("阿里巴巴", LIBRARY_TAOBAO_ANDROID_NETWORK)
+        }
+        if (line.startsWith("com.taobao.accs")) {
+            return Pair("阿里巴巴", LIBRARY_TAOBAO_ANDROID_ACCS)
+        }
         val index = line.indexOf(" ")
         var clsName = line
         if (index != -1) {
@@ -464,6 +467,8 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         const val LIBRARY_TENCENT_QQ = "com.tencent:qq"
         const val LIBRARY_WX = "com.tencent.mm.opensdk:wechat-sdk-android"
         const val LIBRARY_HUNDSUN = "com.hundsun"
+        const val LIBRARY_TAOBAO_ANDROID_NETWORK = "com.taobao.android:networksdk"
+        const val LIBRARY_TAOBAO_ANDROID_ACCS = "com.taobao.android:accs_sdk_taobao"
 
     }
 }

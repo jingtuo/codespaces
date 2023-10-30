@@ -1,0 +1,39 @@
+[
+  {
+    "name": "蓝牙-扫描",
+    "clsName": "android.bluetooth.BluetoothAdapter",
+    "isField": false,
+    "methodName": "startDiscovery",
+    "methodReturnType": "boolean"
+  },
+  {
+    "name": "蓝牙-扫描",
+    "clsName": "android.bluetooth.BluetoothAdapter",
+    "isField": false,
+    "methodName": "startLeScan",
+    "paramTypes": ["android.bluetooth.BluetoothAdapter$LeScanCallback"],
+    "methodReturnType": "boolean"
+  },
+  {
+    "name": "蓝牙-扫描",
+    "clsName": "android.bluetooth.le.BluetoothLeScanner",
+    "isField": false,
+    "methodName": "startScan",
+    "paramTypes": ["java.util.List", "android.bluetooth.le.ScanSettings", "android.app.PendingIntent"],
+    "methodReturnType": "int"
+  },
+  {
+    "name": "蓝牙-扫描",
+    "clsName": "android.bluetooth.le.BluetoothLeScanner",
+    "isField": false,
+    "methodName": "startScan",
+    "paramTypes": ["android.bluetooth.le.ScanCallback"]
+  },
+  {
+    "name": "蓝牙-扫描",
+    "clsName": "android.bluetooth.le.BluetoothLeScanner",
+    "isField": false,
+    "methodName": "startScan",
+    "paramTypes": ["java.util.List", "android.bluetooth.le.ScanSettings", "android.bluetooth.le.ScanCallback"]
+  }
+]
