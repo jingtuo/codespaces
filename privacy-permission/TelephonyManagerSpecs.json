@@ -1,10 +1,11 @@
-[{
+[
+  {
   "name": "设备信息-DeviceId",
   "clsName": "android.telephony.TelephonyManager",
   "isField": false,
   "methodName": "getDeviceId",
   "methodReturnType": "java.lang.String"
-},
+  },
   {
     "name": "设备信息-DeviceId",
     "clsName": "android.telephony.TelephonyManager",
@@ -121,5 +122,12 @@
     "isField": false,
     "methodName": "registerTelephonyCallback",
     "paramTypes": ["java.util.concurrent.Executor", "android.telephony.TelephonyCallback"]
+  },
+  {
+    "name": "设备信息-ICC-ID",
+    "clsName": "android.telephony.SubscriptionInfo",
+    "isField": false,
+    "methodName": "getIccId",
+    "methodReturnType": "java.lang.String"
   }
 ]

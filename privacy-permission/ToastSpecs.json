@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Toast.getView",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getView",
+    "methodReturnType": "android.view.View"
+  },
+  {
+    "name": "Toast.getHorizontalMargin",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getHorizontalMargin",
+    "methodReturnType": "float"
+  },
+  {
+    "name": "Toast.getVerticalMargin",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getVerticalMargin",
+    "methodReturnType": "float"
+  },
+  {
+    "name": "Toast.getGravity",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getGravity",
+    "methodReturnType": "int"
+  },
+  {
+    "name": "Toast.getXOffset",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getXOffset",
+    "methodReturnType": "int"
+  },
+  {
+    "name": "Toast.getYOffset",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "getYOffset",
+    "methodReturnType": "int"
+  },
+  {
+    "name": "Toast.setGravity",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "setGravity",
+    "paramTypes": ["int", "int", "int"]
+  },
+  {
+    "name": "Toast.setMargin",
+    "clsName": "android.widget.Toast",
+    "isField": false,
+    "methodName": "setMargin",
+    "paramTypes": ["float", "float"]
+  }
+]

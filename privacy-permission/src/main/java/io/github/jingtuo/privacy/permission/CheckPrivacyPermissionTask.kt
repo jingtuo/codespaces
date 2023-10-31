@@ -102,16 +102,6 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
             permissionSpecs = gson.fromJson(it, object : TypeToken<List<PermissionSpec>>() {
             }.type)
         }
-        permissionSpecs?.map {
-            var matchContent = "L${it.clsName.replace("\\.", "/")};->"
-            matchContent += if (it.isField) {
-                "${it.fieldName}:${getDexType(it.fieldType)}"
-            } else {
-                "${it.methodName}()L${getDexType(it.methodReturnType)}"
-            }
-            println(matchContent)
-            matchContent
-        }
         val folder = getOutputDir().get().asFile
         permissionSpecs?.let {
             for ((index, item) in it.withIndex()) {
