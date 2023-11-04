@@ -14,7 +14,7 @@
 Using the plugins DSL:
 ```groovy
 plugins {
-    id "io.github.jingtuo.privacy-permission" version "0.0.1"
+    id "io.github.jingtuo.privacy-permission" version "0.0.3"
 }
 ```
 
@@ -27,7 +27,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "io.github.jingtuo:privacy-permission:0.0.1"
+    classpath "io.github.jingtuo:privacy-permission:0.0.3"
   }
 }
 ```
