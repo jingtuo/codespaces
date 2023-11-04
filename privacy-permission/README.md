@@ -64,6 +64,10 @@ privacyPermission {
 
 ## 版本
 
+### 0.0.3
+
+1. 移除调试代码, 梳理几种常用三方库
+
 ### 0.0.2
 
 1. 移除对Kotlin序列化插件的依赖, 使用Gson解析permissionSpecsFile文件
@@ -71,6 +75,13 @@ privacyPermission {
 ### 0.0.1
 
 1. 基于Apk Analyzer收集隐私权限相关类的调用堆栈
+
+
+## 问题
+
+1. 已知与其他插件依赖的commons-io版本冲突, 不兼容依赖commons-io低版本的插件
+2. 尽量使用最新版, 已在11.0版本中验证
+
 
 ## 参考资料
 

@@ -16,13 +16,13 @@ privacyPermission {
 }
 
 android {
-    namespace 'io.github.jingtuo.codespaces'
-    compileSdk 33
+    namespace 'io.github.jingtuo.laboratory'
+    compileSdk 34
 
     defaultConfig {
-        applicationId "io.github.jingtuo.codespaces"
-        minSdk 21
-        targetSdk 33
+        applicationId "io.github.jingtuo.laboratory"
+        minSdk 19
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -39,19 +39,36 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
     applicationVariants.all{
 
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
+    //appcompat:1.6.1依赖activity:1.8.0
+    //activity:1.8.0要求compileSdk=34
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    //最新版本要求compileSdk>=32, 要求使用Java 8编译
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation project(path: ':webview')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation group: 'com.google.dagger', name: 'hilt-android-gradle-plugin', version: '2.42'
-//    implementation group: 'com.squareup', name: 'javapoet', version: '1.13.0'
-    implementation 'com.android.tools.build:gradle:8.0.2'
+
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.4.0'
+    implementation 'org.greenrobot:eventbus:3.3.1'
+
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
 }
