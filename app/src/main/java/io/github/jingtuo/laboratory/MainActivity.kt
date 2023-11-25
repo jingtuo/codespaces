@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 2
             }
+            //此时menu尚未选中
             binding.viewPager.setCurrentItem(index, false)
             true
         }
@@ -93,15 +94,17 @@ class MainActivity : AppCompatActivity() {
                 val url = if (0 == position) {
                     "https://developer.android.google.cn/"
                 } else if (1 == position) {
-                    "https://github.com"
+                    "https://www.baidu.com/"
                 } else {
-                    "https://gitee.com"
+                    "https://gitee.com/"
                 }
                 return WebViewFragment.Builder(url).build()
             }
         }
         binding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
         binding.viewPager.adapter = adapter
+        //禁用左右滑动
+        binding.viewPager.isUserInputEnabled = false
     }
 
     override fun onStart() {

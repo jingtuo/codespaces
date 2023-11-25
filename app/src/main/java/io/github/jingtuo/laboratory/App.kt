@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.util.Log
+import io.github.jingtuo.android.webview.WebViewHelper
 
 class App : Application(), ActivityLifecycleCallbacks {
 
@@ -20,6 +21,7 @@ class App : Application(), ActivityLifecycleCallbacks {
     override fun onCreate() {
         super.onCreate()
         Log.i(TAG, "App onCreate")
+        WebViewHelper.logEnabled = true
         if (isMainProcess()) {
             registerActivityLifecycleCallbacks(this)
         }

@@ -100,7 +100,7 @@ class WebViewHelper {
          * @param intent The intent to check with.
          * @return Whether there is a specialized handler for the given intent.
          */
-        private fun hasSpecializedHandlerIntents(context: Context, intent: Intent): Boolean {
+                private fun hasSpecializedHandlerIntents(context: Context, intent: Intent): Boolean {
             try {
                 val pm = context.packageManager
                 val handlers = pm.queryIntentActivities(
@@ -122,6 +122,8 @@ class WebViewHelper {
             return false
         }
 
+        @JvmStatic
+        var logEnabled = false
 
     }
 

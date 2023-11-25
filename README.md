@@ -49,6 +49,21 @@
 1. 使用KeyGenerator.getInstance(algorithm, provider)生成SM4的密钥KEY, 遇到错误: java.security.InvalidAlgorithmParameterException: Not Implemented  
    暂时未明白: JceSecurity.getInstance("KeyGenerator", KeyGeneratorSpi.class, algorithm, provider)找到的是BaseKeyGenerator
 
+## 定时任务
+
+### 问题
+
+| 类 | 属性/方法 | OPPO Reno 3 元气版 |
+| :-- | :-- | :-- |
+| AlarmManager | setInexactRepeating | 应用切后台锁屏, 闹钟无法触发, 解锁打开应用, 触发闹钟 |
+| AlarmManager | setExactAndAllowWhileIdle | 应用切后台锁屏, 闹钟无法触发, 解锁打开应用, 触发闹钟 |
+| AlarmManager | ACTION_NEXT_ALARM_CLOCK_CHANGED  与getNextAlarmClock配合使用, 下一个闹钟被修改(删除)之后触发 | 应用切换至后台, 不会收到广播 |
+| PowerManager | isIgnoringBatteryOptimizations | false |
+| Settings | ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS | No Activity found to handle Intent |
+| Intent | ACTION_TIME_TICK  每分钟开始(05:00)触发一次 | 应用切后台锁屏, 闹钟无法触发, 解锁打开应用, 收到最近一次的广播 |
+| Intent | ACTION_SCREEN_ON  | 应用处于前台, 点亮屏幕, 不论是否解锁成功, 应用就能收到广播; 应用处于后台, 不会收到广播 |
+| RoleManager | createRequestRoleIntent(RoleManager.ROLE_DIALER) | 直接返回Activity.RESULT_CANCELED |
+
 
 ## 隐私权限
 
@@ -57,6 +72,26 @@
 ## WebView
 
 基于学习WebView的过程, 封装WebView组件, 详见[这里](webview/README.md)
+
+## 课外知识
+
+### 矢量图
+
+1. group支持的属性动画, 支持的属性: rotation, translateX, translateY
+2. 不支持帧动画
+
+### 弧线函数
+
+- M, 移动函数, 参数:
+    - x,y 直接移动到某个点
+- L和l, 连接函数, 参数:
+    - x,y 连接到某个点, 直接多个坐标, 如:lx1,y1 x2,y2
+- A和a, 参数:
+    - 半径: xRadius,yRadius,
+    - x轴旋转角度: xAxisRotation, 暂未搞明白如何对圆进行动画
+    - 大弧小弧标志: largeArcFlag, 1-大弧, 如果画半圆大弧小弧无区别
+    - 顺时针逆时针标志: sweepFlag, 1-顺时针
+    - 终点: x,y
 
 ## 待学习
 

@@ -10,6 +10,13 @@
 2. 小米5 Pad Pro(Android 13)是直接在浏览器中, 该设备不支持CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 3. vivo S10 Pro(Android 13)是直接在浏览器中, 该设备不支持CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 
+
+## 课外知识
+
+1. 百度的scheme
+   - 语音搜索：baiduboxapp://speech/startVoiceSearch
+   - 图片搜索：baiduboxapp://browser/imageSearch
+
 ## 参考资料
 
 - [Web Apps](https://developer.android.google.cn/guide/webapps?hl=zh-cn)

@@ -1,6 +1,7 @@
 package io.github.jingtuo.android.webview
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -149,7 +150,9 @@ class WebViewFragment private constructor(): Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         webView.settings.javaScriptEnabled = true
-        webView.webViewClient = JtWebViewClient()
+        val webViewClient = JtWebViewClient(false)
+        webView.webViewClient = webViewClient
+        webView.webChromeClient = JtWebChromeClient()
         arguments?.let {
             val url = it.getString(EXTRA_URL, "")
             webView.loadUrl(url)
@@ -158,22 +161,18 @@ class WebViewFragment private constructor(): Fragment() {
 
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "onStart ${webView.url}")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.i(TAG, "onResume ${webView.url}")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.i(TAG, "onPause ${webView.url}")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.i(TAG, "onStop ${webView.url}")
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

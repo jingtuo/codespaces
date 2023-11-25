@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">代码空间</string>
+    <string name="app_name">实验室</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>

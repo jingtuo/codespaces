@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
+import android.text.TextUtils
 import android.util.Log
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceError
@@ -16,18 +17,20 @@ import androidx.annotation.RequiresApi
 /**
  * 封装系统[WebViewClient]
  */
-open class JtWebViewClient: WebViewClient() {
-
+open class JtWebViewClient(private val historyEnabled: Boolean): WebViewClient() {
+    
     companion object {
-        const val TAG = "JtWebView"
+        const val TAG = "WebViewClient"
+        const val SCHEME_HTTP = "http"
+        const val SCHEME_HTTPS = "https"
     }
 
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
         if (url != null) {
             try {
                 val uri = Uri.parse(url)
-                if (view != null && shouldOverrideUrlLoading(view, uri)) {
-                    return false
+                if (view != null) {
+                    return shouldOverrideUrlLoading(view, uri)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "An error(${e.message}) occurred while loading the url($url)")
@@ -42,21 +45,42 @@ open class JtWebViewClient: WebViewClient() {
         val uri = request?.url
         if (uri != null) {
             try {
-                if (view != null && shouldOverrideUrlLoading(view, uri)) {
-                    return false
+                if (view != null) {
+                    return shouldOverrideUrlLoading(view, uri)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "An error(${e.message}) occurred while loading the url($uri)")
             }
         }
-        //由系统处理
+        //取消当前请求
         return true
     }
 
     /**
-     * 是否拦截uri, 返回true表示内部处理
+     * true: 表示取消当前请求
+     * false: 加载当前请求
      */
     open fun shouldOverrideUrlLoading(view: WebView, uri: Uri): Boolean {
+        val scheme = uri.scheme
+        if (TextUtils.isEmpty(scheme)) {
+            return true
+        }
+        //经验证, 加载百度网页之后, 进行搜索时触发加载新的uri, 但canGoBack()返回false,
+        //所以不能使用canGoBack判断是否有历史
+        val backForwardList = view.copyBackForwardList()
+        if (backForwardList.size == 0) {
+            //没有历史, url直接转发
+            //交给当前WebView继续加载
+            return false
+        }
+        if (historyEnabled) {
+            //支持历史功能
+            if (SCHEME_HTTPS == scheme || SCHEME_HTTP == scheme) {
+                //交给当前WebView继续加载
+                return false
+            }
+        }
+        view.context.startActivity(Intent(Intent.ACTION_VIEW, uri))
         return true
     }
 
@@ -66,7 +90,6 @@ open class JtWebViewClient: WebViewClient() {
         description: String?,
         failingUrl: String?
     ) {
-        super.onReceivedError(view, errorCode, description, failingUrl)
         Log.e(TAG, "an error($errorCode, $description) occurred while loading the url(${failingUrl})")
     }
 
@@ -92,6 +115,7 @@ open class JtWebViewClient: WebViewClient() {
 
     override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
         super.onReceivedSslError(view, handler, error)
-        Log.e(TAG, "an http error(${error?.primaryError}, ${error?.certificate}) occurred while loading the url(${error?.url})")
+        Log.e(TAG, "an ssl error(${error?.primaryError}, ${error?.certificate}) occurred while loading the url(${error?.url})")
     }
+
 }

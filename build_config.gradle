@@ -1,0 +1,15 @@
+ext {
+    //Retrofit
+    def retrofit_version = '2.9.0'
+    //OkHttp
+    def okhttp_version = "4.11.0"
+
+    libs = [
+            retrofit               : "com.squareup.retrofit2:retrofit:$retrofit_version",
+            retrofit_converter_gson: "com.squareup.retrofit2:converter-gson:$retrofit_version",
+            retrofit_adapter_rxjava: "com.squareup.retrofit2:adapter-rxjava3:$retrofit_version",
+            okhttp                 : "com.squareup.okhttp3:okhttp:$okhttp_version",
+            okhttp_logging         : "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    ]
+
+}
