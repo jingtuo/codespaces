@@ -55,12 +55,14 @@ privacyPermission {
   {
     "name": "应用进程",
     "clsName": "android.app.ActivityManager",
-    "isField": false,
+    "type": "field",
     "methodName": "getRunningAppProcesses",
     "methodReturnType": "java.util.List"
   }
 ]
 ```
+
+> type可取值: init、method、field
 
 ## 版本
 
