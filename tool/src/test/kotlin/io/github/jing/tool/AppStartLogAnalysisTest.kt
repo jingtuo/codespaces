@@ -11,7 +11,7 @@ internal class AppStartLogAnalysisTest() {
 
     @Test
     fun parse() {
-        analysis.parse(File("D:/文档/日志/20230818-2.log"), File("D:/文档/日志/20230818-2.csv"))
+        analysis.parse(File("D:/文档/数据/20231107-1.log"), File("D:/文档/数据/20231107-2.csv"))
     }
 
 }

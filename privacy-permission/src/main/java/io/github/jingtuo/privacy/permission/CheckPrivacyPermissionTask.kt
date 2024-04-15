@@ -243,7 +243,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         command: String, apkFilePath: String, mappingFilePath: String,
         referencesTo: String
     ): List<List<String>> {
-        val builder = if (mappingFilePath.isNullOrEmpty()) {
+        val builder = if (mappingFilePath.isEmpty()) {
             ProcessBuilder(
                 command, "dex", "reference-tree", "--references-to", referencesTo,
                 apkFilePath
@@ -293,7 +293,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
                 error += "$line\n"
             }
         }
-        if (!error.isNullOrEmpty()) {
+        if (error.isNotEmpty()) {
             println("$referencesTo error:\n$error ")
         }
         process.destroy()
@@ -306,7 +306,7 @@ abstract class CheckPrivacyPermissionTask : DefaultTask() {
         permissionSpec: PermissionSpec,
         referenceTree: List<List<String>>
     ) {
-        if (referenceTree.isNullOrEmpty()) {
+        if (referenceTree.isEmpty()) {
             return
         }
         val wb = SXSSFWorkbook(100)

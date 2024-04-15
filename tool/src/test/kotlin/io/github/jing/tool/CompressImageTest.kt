@@ -74,4 +74,25 @@ class CompressImageTest {
         compress.compressByTinify(data)
     }
 
+    @Test
+    fun testCompressOn20231108() {
+        val compress = CompressImage()
+        val data = listOf("D:\\Projects\\develop-20231103\\TZYJ_Android\\hs_splash\\src\\main\\res\\drawable-xxhdpi\\guide_1.png",
+            "D:\\Projects\\develop-20231103\\TZYJ_Android\\hs_splash\\src\\main\\res\\drawable-xxhdpi\\guide_2.png",
+            "D:\\Projects\\develop-20231103\\TZYJ_Android\\hs_splash\\src\\main\\res\\drawable-xxhdpi\\guide_3.png",
+            "D:\\Projects\\develop-20231103\\TZYJ_Android\\hs_person\\src\\main\\res-ghzq\\drawable-xxhdpi\\about.png",
+            "D:\\Projects\\develop-20231103\\TZYJ_Android\\hs_common\\src\\main\\res-ghzq\\drawable-xxhdpi\\common_app_icon.png"
+        )
+        compress.compressByTinify(data)
+    }
+
+    @Test
+    fun testCompressOn2023111() {
+        val compress = CompressImage()
+        val data = listOf("D:\\Projects\\develop-20231115\\AutoPacking\\GHZQ\\Picture\\2x\\app_icon.png",
+            "D:\\Projects\\develop-20231115\\AutoPacking\\GHZQ\\Picture\\3x\\app_icon.png",
+        )
+        compress.compressByTinify(data)
+    }
+
 }

@@ -34,7 +34,7 @@ def gitHttpUrl = "https://github.com/jingtuo/codespaces.git"
 //分组
 def curArtifactId = "privacy-permission"
 group = "io.github.jingtuo"
-version = '0.0.3'
+version = '0.0.4'
 def pluginId = "io.github.jingtuo.$curArtifactId"
 
 gradlePlugin {

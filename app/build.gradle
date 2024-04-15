@@ -7,12 +7,12 @@ apply plugin: "io.github.jingtuo.privacy-permission"
 
 privacyPermission {
     //指定的目录必须存在
-    cmdlineToolsDir = file("C:/Android/Sdk/cmdline-tools/latest")
+    cmdlineToolsDir = file("D:\\Android\\sdk\\cmdline-tools\\latest")
     //指定的文件必须存在, 非加固包
-    apkFile = file("D:/apk/test/test.apk")
+    apkFile = file("D:\\apk\\ghjth\\7.14.0\\size\\Jth-7.14.0.0-TEST-202403281406.apk")
     mappingFilePath = ""
-    permissionSpecsFile = file("D:\\Projects\\github\\jingtuo\\Codespaces\\privacy-permission\\permissionSpecs.json")
-    outputDir = file("D:\\apk\\test2")
+    permissionSpecsFile = file("D:\\Projects\\github\\jingtuo\\codespaces\\privacy-permission\\TestSpecs.json")
+    outputDir = file("D:\\apk\\20240304-1")
 }
 
 android {

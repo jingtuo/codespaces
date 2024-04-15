@@ -26,9 +26,9 @@ class CompressImage {
             val fromPath = it
             val index = it.lastIndexOf(".")
             var toPath = if (index == -1) {
-                fromPath + "_compress"
+                fromPath
             } else {
-                it.substring(0, index) + "_compress" + it.substring(index)
+                it.substring(0, index) + it.substring(index)
             }
             Source.fromFile(fromPath).toFile(toPath)
         }

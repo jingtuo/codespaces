@@ -69,6 +69,11 @@
 
 基于apkanalyzer检索apk中引用树的功能, 查找涉及隐私权限的代码调用堆栈, 详见[这里](privacy-permission/README.md)
 
+### 版本
+
+- 0.0.3
+    - 支持扫描构造函数
+
 ## WebView
 
 基于学习WebView的过程, 封装WebView组件, 详见[这里](webview/README.md)
